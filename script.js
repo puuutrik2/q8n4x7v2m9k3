@@ -23,20 +23,32 @@ const photoNext = document.querySelector("#photoNext");
 const photoCards = Array.from(document.querySelectorAll(".photo-card"));
 const loginLink = document.querySelector(".login-screen a[href='/auth/discord']");
 const defaultApiBase = "https://blanch-worker-k8m4x2q9.rodionpytra.workers.dev";
-const apiParam = new URLSearchParams(window.location.search).get("api");
+const searchParams = new URLSearchParams(window.location.search);
+const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+const apiParam = searchParams.get("api");
+const sessionParam = hashParams.get("session");
 
 if (apiParam) {
   localStorage.setItem("blanch-api-base", apiParam.replace(/\/$/, ""));
 }
 
+if (sessionParam) {
+  localStorage.setItem("blanch-session", sessionParam);
+  window.history.replaceState(null, "", `${window.location.pathname}?login=ok`);
+}
+
 const apiBase = (localStorage.getItem("blanch-api-base") || defaultApiBase).replace(/\/$/, "");
+const savedSession = () => localStorage.getItem("blanch-session") || "";
 
 function apiUrl(path) {
   return `${apiBase}${path}`;
 }
 
 function apiFetch(path, options = {}) {
-  return fetch(apiUrl(path), { credentials: "include", ...options });
+  const headers = new Headers(options.headers || {});
+  const session = savedSession();
+  if (session) headers.set("Authorization", `Bearer ${session}`);
+  return fetch(apiUrl(path), { credentials: "include", ...options, headers });
 }
 
 if (loginLink) {
@@ -329,6 +341,7 @@ if (backToMain) backToMain.addEventListener("click", showMain);
 if (logoutButton) {
   logoutButton.addEventListener("click", async () => {
     await apiFetch("/auth/logout", { method: "POST" });
+    localStorage.removeItem("blanch-session");
     currentUser = null;
     cooldownLeftMs = 0;
     updateAuthUi();
