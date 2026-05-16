@@ -22,13 +22,14 @@ const photoPrev = document.querySelector("#photoPrev");
 const photoNext = document.querySelector("#photoNext");
 const photoCards = Array.from(document.querySelectorAll(".photo-card"));
 const loginLink = document.querySelector(".login-screen a[href='/auth/discord']");
+const defaultApiBase = "https://blanch-worker-k8m4x2q9.rodionpytra.workers.dev";
 const apiParam = new URLSearchParams(window.location.search).get("api");
 
 if (apiParam) {
   localStorage.setItem("blanch-api-base", apiParam.replace(/\/$/, ""));
 }
 
-const apiBase = (localStorage.getItem("blanch-api-base") || "").replace(/\/$/, "");
+const apiBase = (localStorage.getItem("blanch-api-base") || defaultApiBase).replace(/\/$/, "");
 
 function apiUrl(path) {
   return `${apiBase}${path}`;
