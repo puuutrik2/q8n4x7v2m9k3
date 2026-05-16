@@ -38,6 +38,7 @@ const channelId = process.env.DISCORD_CHANNEL_ID;
 const clientId = process.env.DISCORD_CLIENT_ID;
 const clientSecret = process.env.DISCORD_CLIENT_SECRET;
 const redirectUri = process.env.DISCORD_REDIRECT_URI || `http://127.0.0.1:${port}/auth/discord/callback`;
+const host = process.env.HOST || "0.0.0.0";
 
 let gatewaySocket = null;
 let gatewayHeartbeat = null;
@@ -432,7 +433,7 @@ const server = http.createServer(async (request, response) => {
   }
 });
 
-server.listen(port, "127.0.0.1", () => {
-  console.log(`BLANCH site: http://127.0.0.1:${port}`);
+server.listen(port, host, () => {
+  console.log(`BLANCH site listening on ${host}:${port}`);
   connectGateway();
 });
