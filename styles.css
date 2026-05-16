@@ -537,10 +537,10 @@ a {
 .photo-grid {
   position: relative;
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 18px;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 20px;
   align-items: start;
-  width: min(1120px, 100%);
+  width: min(1320px, 100%);
   margin: 0 auto;
 }
 
@@ -558,7 +558,9 @@ a {
 .photo-card {
   position: relative;
   display: block;
-  aspect-ratio: 16 / 9;
+  grid-column: span 2;
+  min-height: 176px;
+  aspect-ratio: 16 / 8.7;
   padding: 0;
   overflow: hidden;
   cursor: pointer;
@@ -566,17 +568,29 @@ a {
 }
 
 .photo-card:nth-child(1) {
-  grid-column: span 2;
-  aspect-ratio: 16 / 7.2;
+  grid-column: 1 / -1;
+  width: min(940px, 100%);
+  justify-self: center;
+  min-height: 310px;
+  aspect-ratio: 16 / 6.8;
 }
 
-.photo-card:nth-child(4),
+.photo-card:nth-child(2) {
+  grid-column: 1 / span 3;
+  min-height: 250px;
+}
+
+.photo-card:nth-child(3) {
+  grid-column: 4 / span 3;
+  min-height: 250px;
+}
+
 .photo-card:nth-child(7) {
-  margin-top: 42px;
+  grid-column: 2 / span 2;
 }
 
-.photo-card:nth-child(6) {
-  margin-top: -34px;
+.photo-card:nth-child(8) {
+  grid-column: 4 / span 2;
 }
 
 .photo-card span {

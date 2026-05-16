@@ -21,6 +21,26 @@ const photoViewerCount = document.querySelector("#photoViewerCount");
 const photoPrev = document.querySelector("#photoPrev");
 const photoNext = document.querySelector("#photoNext");
 const photoCards = Array.from(document.querySelectorAll(".photo-card"));
+const loginLink = document.querySelector(".login-screen a[href='/auth/discord']");
+const apiParam = new URLSearchParams(window.location.search).get("api");
+
+if (apiParam) {
+  localStorage.setItem("blanch-api-base", apiParam.replace(/\/$/, ""));
+}
+
+const apiBase = (localStorage.getItem("blanch-api-base") || "").replace(/\/$/, "");
+
+function apiUrl(path) {
+  return `${apiBase}${path}`;
+}
+
+function apiFetch(path, options = {}) {
+  return fetch(apiUrl(path), { credentials: "include", ...options });
+}
+
+if (loginLink) {
+  loginLink.href = apiUrl("/auth/discord");
+}
 
 let width = 0;
 let height = 0;
@@ -173,7 +193,7 @@ function updateAuthUi() {
 
 async function loadAuth() {
   try {
-    const response = await fetch("/api/me");
+    const response = await apiFetch("/api/me");
     const result = await response.json();
     currentUser = result.user;
     cooldownLeftMs = result.cooldownLeft || 0;
@@ -307,7 +327,7 @@ if (backToMain) backToMain.addEventListener("click", showMain);
 
 if (logoutButton) {
   logoutButton.addEventListener("click", async () => {
-    await fetch("/auth/logout", { method: "POST" });
+    await apiFetch("/auth/logout", { method: "POST" });
     currentUser = null;
     cooldownLeftMs = 0;
     updateAuthUi();
@@ -350,7 +370,7 @@ if (joinForm && formStatus) {
     submitButton.disabled = true;
 
     try {
-      const response = await fetch("/api/apply", {
+      const response = await apiFetch("/api/apply", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
