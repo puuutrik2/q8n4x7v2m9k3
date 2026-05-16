@@ -1,0 +1,229 @@
+﻿<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BLANCH Family | GTA 5 RP</title>
+    <meta
+      name="description"
+      content="Официальный сайт семьи BLANCH в GTA 5 RP: каналы, роли, правила, вступление и стиль холодного хрома."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <canvas class="noise-field" id="noiseField" aria-hidden="true"></canvas>
+    <div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
+
+    <section class="login-screen" id="loginScreen">
+      <div class="login-panel">
+        <p class="eyebrow">BLANCH FAMILY</p>
+        <h1 class="login-title">Вход на сайт</h1>
+        <p>Для просмотра сайта и подачи заявки нужен вход через Discord.</p>
+        <a class="button button-primary magnetic" href="/auth/discord">Войти через Discord</a>
+      </div>
+    </section>
+
+    <header class="site-header app-shell" hidden>
+      <a class="brand" href="#top" aria-label="BLANCH">
+        <span class="brand-mark">B</span>
+        <span>BLANCH</span>
+      </a>
+      <nav class="nav" aria-label="Главная навигация">
+        <a href="#family">Семья</a>
+        <a href="#photos">Фото</a>
+        <a href="#rules">Правила</a>
+        <a href="#join">Вступить</a>
+      </nav>
+      <div class="header-actions">
+        <button class="top-back" id="backToMain" type="button" hidden>На главный экран</button>
+        <div class="user-menu" id="userMenu">
+          <button class="user-button" id="userButton" type="button">
+            <img class="user-avatar" id="userAvatar" alt="" />
+            <span id="userName">Discord</span>
+          </button>
+          <div class="user-dropdown" id="userDropdown" hidden>
+            <button type="button" id="settingsButton">Настройки</button>
+            <button type="button" id="logoutButton">Выйти</button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main id="top" class="app-shell" hidden>
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-bg" aria-hidden="true">
+          <span class="blade blade-one"></span>
+          <span class="blade blade-two"></span>
+          <span class="blade blade-three"></span>
+        </div>
+
+        <div class="hero-inner">
+          <p class="eyebrow">GTA 5 RP FAMILY</p>
+          <h1 id="hero-title" class="chrome-title" data-text="BLANCH">BLANCH</h1>
+          <p class="hero-copy">
+            Официальный хаб семьи: роли, правила сервера и заявка в состав.
+            Черный фон, холодный хром и стиль, который сразу считывается.
+          </p>
+
+          <div class="hero-actions">
+            <a class="button button-primary magnetic" href="#join">Подать заявку</a>
+            <a class="button button-ghost magnetic" href="#photos">Смотреть фото</a>
+          </div>
+        </div>
+
+      </section>
+
+      <section class="section family-section" id="family" aria-labelledby="family-title">
+        <div class="section-heading">
+          <p class="eyebrow">About Family</p>
+          <h2 id="family-title">О семье BLANCH</h2>
+        </div>
+        <div class="family-grid">
+          <article class="feature-card reveal">
+            <span class="card-index">01</span>
+            <h3>Фамилия</h3>
+            <p>BLANCH носят только участники семьи. Фамилия должна выглядеть достойно в игре, чате и Discord.</p>
+          </article>
+          <article class="feature-card reveal">
+            <span class="card-index">02</span>
+            <h3>Состав</h3>
+            <p>Внутри семьи есть старший состав, основной состав и новички. Каждый ранг отвечает за свои задачи.</p>
+          </article>
+          <article class="feature-card reveal">
+            <span class="card-index">03</span>
+            <h3>Поведение</h3>
+            <p>Без лишних конфликтов, рекламы и слива информации. Уважение к семье важнее случайного хайпа.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section photos-section" id="photos" aria-labelledby="photos-title">
+        <div class="section-heading">
+          <p class="eyebrow">Gallery</p>
+          <h2 id="photos-title">Фото BLANCH</h2>
+        </div>
+
+        <div class="photo-grid" aria-label="Галерея BLANCH">
+          <button class="photo-card reveal" type="button" data-index="0" data-src="coming-soon.gif?v=2" data-title="В скором времени"><span>01</span><img src="coming-soon.gif?v=2" alt="В скором времени" /><strong>В скором времени</strong></button>
+          <button class="photo-card reveal" type="button" data-index="1" data-src="coming-soon.gif?v=2" data-title="В скором времени"><span>02</span><img src="coming-soon.gif?v=2" alt="В скором времени" /><strong>В скором времени</strong></button>
+          <button class="photo-card reveal" type="button" data-index="2" data-src="coming-soon.gif?v=2" data-title="В скором времени"><span>03</span><img src="coming-soon.gif?v=2" alt="В скором времени" /><strong>В скором времени</strong></button>
+          <button class="photo-card reveal" type="button" data-index="3" data-src="coming-soon.gif?v=2" data-title="В скором времени"><span>04</span><img src="coming-soon.gif?v=2" alt="В скором времени" /><strong>В скором времени</strong></button>
+          <button class="photo-card reveal" type="button" data-index="4" data-src="coming-soon.gif?v=2" data-title="В скором времени"><span>05</span><img src="coming-soon.gif?v=2" alt="В скором времени" /><strong>В скором времени</strong></button>
+          <button class="photo-card reveal" type="button" data-index="5" data-src="coming-soon.gif?v=2" data-title="В скором времени"><span>06</span><img src="coming-soon.gif?v=2" alt="В скором времени" /><strong>В скором времени</strong></button>
+          <button class="photo-card reveal" type="button" data-index="6" data-src="coming-soon.gif?v=2" data-title="В скором времени"><span>07</span><img src="coming-soon.gif?v=2" alt="В скором времени" /><strong>В скором времени</strong></button>
+          <button class="photo-card reveal" type="button" data-index="7" data-src="coming-soon.gif?v=2" data-title="В скором времени"><span>08</span><img src="coming-soon.gif?v=2" alt="В скором времени" /><strong>В скором времени</strong></button>
+        </div>
+      </section>
+
+      <section class="section rules-section" id="rules" aria-labelledby="rules-title">
+        <div class="section-heading">
+          <p class="eyebrow">Server Rules</p>
+          <h2 id="rules-title">Правила сервера</h2>
+        </div>
+        <div class="rule-list">
+          <div class="rule-line reveal"><strong>1</strong><p>У каждого пользователя должен стоять ник, как на сервере. 🤝</p></div>
+          <div class="rule-line reveal"><strong>2</strong><p>Запрещается ставить фамилию <b>Blanch</b>, если вы не являетесь членом семьи. 🤝</p></div>
+          <div class="rule-line reveal"><strong>3</strong><p>Запрещается реклама чего-либо без согласования с <span class="inline-role ceo">@CEO</span> и <span class="inline-role attorney">@Attorney</span>. 🤝</p></div>
+          <div class="rule-line reveal"><strong>4</strong><p>Запрещается разглашение чьей-либо персональной информации. 🤝</p></div>
+          <div class="rule-line reveal"><strong>5</strong><p>Запрещается оскорбление старшего состава семьи. 🤝</p></div>
+          <div class="rule-line reveal"><strong>6</strong><p>Запрещается любой сексуальный контент в чатах. 🤝</p></div>
+        </div>
+      </section>
+
+      <section class="join-section" id="join" aria-labelledby="join-title">
+        <div class="join-copy">
+          <p class="eyebrow">Recruitment</p>
+          <h2 id="join-title">Заявка в семью BLANCH</h2>
+          <p>
+            Для вступления важны стабильный онлайн, адекватность, голосовая связь и умение играть в стиле семьи.
+          </p>
+          <p class="auth-cooldown" id="cooldownText"></p>
+        </div>
+        <form class="join-form reveal" id="joinForm">
+          <label>
+            Имя Фамилия IC | Возраст OOC <span>*</span>
+            <input name="identity" type="text" required placeholder="Например: Ivan_Blanch | 16" />
+          </label>
+          <label>
+            Ваш онлайн в день | Часовой пояс <span>*</span>
+            <input name="online" type="text" required placeholder="Например: 5-7 часов | МСК" />
+          </label>
+          <label>
+            В каких семьях были? <span>*</span>
+            <input name="families" type="text" required placeholder="Укажите семьи или напишите: не был" />
+          </label>
+          <label>
+            Почему решили вступить в BLANCH? <span>*</span>
+            <textarea name="reason" required placeholder="Расскажите коротко, почему выбрали нашу семью"></textarea>
+          </label>
+          <label>
+            Ваш опыт на высоких должностях? <span>*</span>
+            <textarea name="experience" required placeholder="Опишите опыт управления, старшего состава, кураторства или лидерства"></textarea>
+          </label>
+          <p class="form-status" id="formStatus" aria-live="polite"></p>
+          <div class="form-actions">
+            <button class="button button-cancel magnetic" type="reset">Отмена</button>
+            <button class="button button-primary magnetic" type="submit">Отправить</button>
+          </div>
+        </form>
+      </section>
+    </main>
+
+    <section class="settings-screen app-shell" id="settingsScreen" hidden>
+      <div class="section-heading">
+        <p class="eyebrow">Settings</p>
+        <h2>Темы сайта</h2>
+      </div>
+      <div class="theme-grid" aria-label="Выбор темы">
+        <button class="theme-card" type="button" data-theme="chrome">
+          <span class="theme-preview chrome-preview"></span>
+          <strong>Chrome</strong>
+          <small>Черный, хром, красный акцент</small>
+        </button>
+        <button class="theme-card" type="button" data-theme="blood">
+          <span class="theme-preview blood-preview"></span>
+          <strong>Blood</strong>
+          <small>Больше красного свечения</small>
+        </button>
+        <button class="theme-card" type="button" data-theme="ice">
+          <span class="theme-preview ice-preview"></span>
+          <strong>Ice</strong>
+          <small>Холодный бело-синий металл</small>
+        </button>
+        <button class="theme-card" type="button" data-theme="violet">
+          <span class="theme-preview violet-preview"></span>
+          <strong>Violet</strong>
+          <small>Темный фиолетовый неон</small>
+        </button>
+      </div>
+    </section>
+
+    <footer class="site-footer app-shell" hidden>
+      <span>BLANCH FAMILY</span>
+      <span>GTA 5 RP</span>
+      <span>Chrome / Black / Ice</span>
+    </footer>
+
+    <div class="photo-modal" id="photoModal" hidden>
+      <div class="photo-modal-backdrop" data-close-photo></div>
+      <div class="photo-viewer" role="dialog" aria-modal="true" aria-label="Просмотр фото">
+        <button class="photo-close" type="button" data-close-photo>×</button>
+        <button class="photo-arrow photo-prev" type="button" id="photoPrev" aria-label="Предыдущее фото">‹</button>
+        <img id="photoViewerImage" alt="" />
+        <button class="photo-arrow photo-next" type="button" id="photoNext" aria-label="Следующее фото">›</button>
+        <div class="photo-caption">
+          <strong id="photoViewerTitle">BLANCH</strong>
+          <span id="photoViewerCount">1 / 8</span>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

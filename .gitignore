@@ -1,0 +1,9 @@
+.env
+*.log
+gif-frames/
+soon-frames/
+node_modules/
+.gh-cli/
+*.zip
+.DS_Store
+Thumbs.db
