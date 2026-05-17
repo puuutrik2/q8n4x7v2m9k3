@@ -399,6 +399,7 @@ if (joinForm && formStatus) {
       formStatus.classList.add("is-success");
       formStatus.textContent = "";
       joinForm.reset();
+      if (result.session) localStorage.setItem("blanch-session", result.session);
       cooldownLeftMs = result.cooldownLeft || 30 * 60 * 1000;
       updateAuthUi();
       playSuccessSound();
