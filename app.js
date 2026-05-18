@@ -308,6 +308,34 @@ const API_BASE = 'https://blanch-worker-k8m4x2q9.rodionpytra.workers.dev';
     });
   });
 })();
+(function setupCrewPhotoSlots() {
+  const formats = ['jpg', 'png', 'webp', 'jpeg'];
+  document.querySelectorAll('.crew-photo[data-photo]').forEach((slot) => {
+    const img = slot.querySelector('img');
+    const base = slot.dataset.photo;
+    if (!img || !base) return;
+
+    let attempt = 0;
+    const loadNext = () => {
+      if (attempt >= formats.length) {
+        slot.classList.add('is-empty');
+        slot.classList.remove('has-photo');
+        img.removeAttribute('src');
+        return;
+      }
+      img.src = base + '.' + formats[attempt];
+      attempt += 1;
+    };
+
+    img.addEventListener('load', () => {
+      slot.classList.remove('is-empty');
+      slot.classList.add('has-photo');
+    });
+    img.addEventListener('error', loadNext);
+    loadNext();
+  });
+})();
+
 /* === end BLANCH interactive card/theme fixes === */
 
 

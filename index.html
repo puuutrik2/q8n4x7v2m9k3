@@ -106,7 +106,7 @@
             <div class="crew-inner">
               <div class="crew-face crew-front">
                 <div class="crew-rank">01</div>
-                <div class="crew-avatar">CEO</div>
+                <div class="crew-photo crew-photo--female is-empty" data-photo="photos/crew/ceo" data-fallback="CEO"><img alt="Глава семьи" loading="lazy" decoding="async"><span>CEO</span></div>
                 <h3>Глава семьи</h3>
                 <p>@CEO</p>
               </div>
@@ -121,7 +121,7 @@
             <div class="crew-inner">
               <div class="crew-face crew-front">
                 <div class="crew-rank">02</div>
-                <div class="crew-avatar">AT</div>
+                <div class="crew-photo is-empty" data-photo="photos/crew/attorney" data-fallback="AT"><img alt="Заместитель" loading="lazy" decoding="async"><span>AT</span></div>
                 <h3>Заместитель</h3>
                 <p>@Attorney</p>
               </div>
@@ -136,7 +136,7 @@
             <div class="crew-inner">
               <div class="crew-face crew-front">
                 <div class="crew-rank">03</div>
-                <div class="crew-avatar">SN</div>
+                <div class="crew-photo is-empty" data-photo="photos/crew/seasoned" data-fallback="SN"><img alt="Руководитель" loading="lazy" decoding="async"><span>SN</span></div>
                 <h3>Руководитель</h3>
                 <p>@Seasoned</p>
               </div>
@@ -151,7 +151,7 @@
             <div class="crew-inner">
               <div class="crew-face crew-front">
                 <div class="crew-rank">04</div>
-                <div class="crew-avatar">CH</div>
+                <div class="crew-photo is-empty" data-photo="photos/crew/chief" data-fallback="CH"><img alt="Куратор" loading="lazy" decoding="async"><span>CH</span></div>
                 <h3>Куратор</h3>
                 <p>@Chief</p>
               </div>
@@ -197,7 +197,7 @@
               <p class="eyebrow">BLANCH ENTRY</p>
               <h3>Оставь заявку и жди связи.</h3>
             </div>
-            <p class="section-copy">КД заявки: 30 минут. Обновление страницы не сбрасывает таймер, потому что состояние держится в сессии.</p>
+            <p class="section-copy">КД заявки: 30 минут.</p>
             <div class="cooldown" id="cooldown"></div>
           </aside>
 
@@ -208,9 +208,6 @@
               </label>
               <label>Онлайн в день | Часовой пояс
                 <input name="online" required placeholder="5 часов | МСК">
-              </label>
-              <label>Ваш Discord
-                <input name="discord" required placeholder="nickname#0000">
               </label>
               <label>В каких семьях были?
                 <input name="families" required placeholder="Не был / список">
