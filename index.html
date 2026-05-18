@@ -1,229 +1,2123 @@
-﻿<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>BLANCH Family | GTA 5 RP</title>
-    <meta
-      name="description"
-      content="Официальный сайт семьи BLANCH в GTA 5 RP: каналы, роли, правила, вступление и стиль холодного хрома."
-    />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Inter:wght@400;500;600;700;800&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body>
-    <canvas class="noise-field" id="noiseField" aria-hidden="true"></canvas>
-    <div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>СЕМЬЯ BLANCH — Лос-Сантос</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600;700&family=Raleway:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --silver:#d0d0d0;--chrome:#f0f0f0;--gold:#c9a227;--dark:#060606;
+  --mid:#0e0e0e;--panel:#0a0a0a;--border:#1e1e1e;--red:#8b0000;
+}
+html{scroll-behavior:smooth}
+body{background:var(--dark);color:var(--silver);font-family:'Raleway',sans-serif;font-weight:300;overflow-x:hidden}
 
-    <section class="login-screen" id="loginScreen">
-      <div class="login-panel">
-        <p class="eyebrow">BLANCH FAMILY</p>
-        <h1 class="login-title">Вход на сайт</h1>
-        <p>Для просмотра сайта и подачи заявки нужен вход через Discord.</p>
-        <a class="button button-primary magnetic" href="/auth/discord">Войти через Discord</a>
+/* ── THREE.JS CANVAS ── */
+#bg-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
+
+/* ── CURSOR ── */
+.cursor{position:fixed;width:8px;height:8px;background:var(--chrome);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:difference;will-change:left,top}
+.cursor-ring{position:fixed;width:36px;height:36px;border:1px solid rgba(255,255,255,0.3);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:transform 0.3s,border-color 0.3s;mix-blend-mode:difference;will-change:left,top}
+
+/* ── DISCORD LOGIN OVERLAY ── */
+#login-overlay{
+  position:fixed;inset:0;z-index:5000;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--dark);
+  transition:opacity 0.9s cubic-bezier(0.16,1,0.3,1),visibility 0.9s;
+}
+#login-overlay.out{opacity:0;visibility:hidden;pointer-events:none}
+
+.login-box{
+  display:flex;flex-direction:column;align-items:center;
+  text-align:center;padding:32px 40px 28px;
+  max-width:480px;width:100%;
+  animation:login-rise 1.2s cubic-bezier(0.16,1,0.3,1) both;
+}
+@keyframes login-rise{
+  from{opacity:0;transform:translateY(40px) scale(0.96)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+
+.login-logo{
+  width:min(280px,60vw);margin-bottom:20px;
+  filter:drop-shadow(0 0 60px rgba(200,200,200,0.18)) drop-shadow(0 0 20px rgba(200,200,200,0.1));
+  animation:login-float 6s ease-in-out infinite;
+}
+@keyframes login-float{
+  0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}
+}
+
+.login-divider{
+  width:100%;display:flex;align-items:center;gap:16px;margin-bottom:16px;
+}
+.login-divider span{flex:1;height:1px;background:linear-gradient(90deg,transparent,#1e1e1e,transparent)}
+.login-divider svg{width:12px;height:12px;fill:var(--gold);flex-shrink:0}
+
+.login-title{
+  font-family:'Cinzel',serif;font-size:0.72rem;
+  letter-spacing:0.45em;text-transform:uppercase;
+  color:#333;margin-bottom:16px;
+}
+.login-desc{
+  font-size:0.82rem;color:#2e2e2e;line-height:1.8;
+  margin-bottom:40px;letter-spacing:0.02em;
+}
+
+.btn-discord{
+  display:flex;align-items:center;justify-content:center;gap:12px;
+  padding:16px 44px;border:none;border-radius:4px;
+  background:#5865F2;color:#fff;
+  font-family:'Cinzel',serif;font-size:0.7rem;
+  letter-spacing:0.22em;text-transform:uppercase;
+  cursor:pointer;transition:all 0.35s cubic-bezier(0.16,1,0.3,1);
+  position:relative;overflow:hidden;
+  box-shadow:0 0 40px rgba(88,101,242,0.25);
+}
+.btn-discord::before{
+  content:'';position:absolute;inset:0;
+  background:rgba(255,255,255,0.08);
+  transform:translateX(-101%);transition:transform 0.35s;
+}
+.btn-discord:hover{transform:translateY(-3px);box-shadow:0 8px 40px rgba(88,101,242,0.45)}
+.btn-discord:hover::before{transform:translateX(0)}
+.btn-discord:active{transform:translateY(0)}
+
+.btn-discord svg{width:22px;height:22px;flex-shrink:0}
+
+.login-note{
+  margin-top:20px;font-size:0.6rem;
+  color:#222;letter-spacing:0.2em;text-transform:uppercase;
+}
+
+/* loading state */
+.btn-discord.loading{pointer-events:none;opacity:0.7}
+.btn-discord.loading::after{
+  content:'';width:16px;height:16px;border:2px solid rgba(255,255,255,0.3);
+  border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── CHECKING STATE ── */
+.login-checking{
+  display:none;flex-direction:column;align-items:center;gap:16px;text-align:center;
+}
+.login-checking.show{display:flex}
+.checking-spinner{
+  width:40px;height:40px;border:1px solid #1e1e1e;
+  border-top-color:var(--gold);border-radius:50%;
+  animation:spin 0.9s linear infinite;
+}
+.checking-text{font-size:0.65rem;letter-spacing:0.3em;text-transform:uppercase;color:#333}
+
+/* ── ACCESS DENIED ── */
+.login-denied{
+  display:none;flex-direction:column;align-items:center;gap:18px;text-align:center;
+}
+.login-denied.show{display:flex}
+.denied-avatar{
+  width:72px;height:72px;border-radius:50%;
+  border:1px solid #2a2a2a;filter:grayscale(1);
+  opacity:0.6;
+}
+.denied-user{font-family:'Cinzel',serif;font-size:0.75rem;letter-spacing:0.2em;color:#444}
+.denied-badge{
+  display:inline-block;padding:5px 16px;
+  border:1px solid var(--red);color:var(--red);
+  font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.3em;text-transform:uppercase;
+  box-shadow:0 0 20px rgba(139,0,0,0.15);
+}
+.denied-msg{font-size:0.8rem;color:#2e2e2e;line-height:1.9;max-width:340px}
+.denied-msg strong{color:#3d3d3d}
+.btn-logout{
+  margin-top:6px;background:transparent;border:1px solid #1e1e1e;
+  color:#2a2a2a;font-family:'Cinzel',serif;font-size:0.58rem;
+  letter-spacing:0.25em;text-transform:uppercase;
+  padding:10px 24px;cursor:pointer;transition:all 0.3s;
+}
+.btn-logout:hover{border-color:#333;color:#555}
+
+/* user info in nav */
+.nav-user{
+  display:flex;align-items:center;gap:10px;
+  font-size:0.65rem;letter-spacing:0.2em;color:#555;
+}
+.nav-avatar{
+  width:30px;height:30px;border-radius:50%;
+  border:1px solid var(--border);object-fit:cover;
+}
+.nav-username{color:#666;letter-spacing:0.1em}
+
+/* logo — GPU composite layer */
+.hero-logo-wrap{will-change:transform;transform-style:preserve-3d}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:1000;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 60px;height:72px;
+  background:rgba(6,6,6,0.85);
+  border-bottom:1px solid rgba(255,255,255,0.04);
+  backdrop-filter:blur(20px);
+  transform:translateY(-100%);
+  animation:nav-drop 1s cubic-bezier(0.16,1,0.3,1) 0.5s forwards;
+}
+@keyframes nav-drop{to{transform:translateY(0)}}
+
+.nav-brand{
+  font-family:'Cinzel Decorative',serif;font-size:1rem;
+  letter-spacing:0.3em;color:var(--chrome);text-decoration:none;
+  text-transform:uppercase;
+  text-shadow:0 0 30px rgba(255,255,255,0.2);
+}
+.nav-links{display:flex;gap:40px;list-style:none}
+.nav-links a{
+  color:#555;text-decoration:none;font-size:0.65rem;
+  letter-spacing:0.25em;text-transform:uppercase;
+  transition:color 0.3s,text-shadow 0.3s;font-weight:500;
+  position:relative;
+}
+.nav-links a::after{
+  content:'';position:absolute;bottom:-4px;left:0;right:0;
+  height:1px;background:var(--gold);
+  transform:scaleX(0);transform-origin:left;transition:transform 0.3s;
+}
+.nav-links a:hover{color:var(--chrome);text-shadow:0 0 20px rgba(255,255,255,0.3)}
+.nav-links a:hover::after{transform:scaleX(1)}
+
+/* ── HERO ── */
+#hero{
+  position:relative;min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;overflow:hidden;padding:120px 20px 80px;z-index:1;
+}
+
+.hero-logo-wrap{
+  position:relative;z-index:2;
+  transform-style:preserve-3d;
+  animation:logo-entrance 1.5s cubic-bezier(0.16,1,0.3,1) 0.8s both;
+}
+@keyframes logo-entrance{
+  from{opacity:0;transform:translateY(60px) rotateX(25deg) scale(0.8)}
+  to{opacity:1;transform:translateY(0) rotateX(0) scale(1)}
+}
+
+.hero-logo{
+  width:min(540px,78vw);
+  filter:
+    drop-shadow(0 0 80px rgba(210,210,210,0.25))
+    drop-shadow(0 0 30px rgba(210,210,210,0.15))
+    drop-shadow(0 20px 60px rgba(0,0,0,0.8));
+  animation:logo-float 7s ease-in-out infinite;
+  transform-style:preserve-3d;
+}
+@keyframes logo-float{
+  0%,100%{transform:translateY(0px) rotateY(0deg)}
+  25%{transform:translateY(-12px) rotateY(2deg)}
+  75%{transform:translateY(-6px) rotateY(-2deg)}
+}
+
+.hero-subtitle{
+  position:relative;z-index:2;margin-top:40px;
+  font-family:'Cinzel',serif;font-size:0.7rem;
+  letter-spacing:0.55em;text-transform:uppercase;color:#444;
+  animation:fade-up 1s ease 1.4s both;
+}
+.hero-tagline{
+  position:relative;z-index:2;margin-top:18px;
+  font-size:1.1rem;font-weight:300;
+  color:#3a3a3a;letter-spacing:0.08em;font-style:italic;
+  animation:fade-up 1s ease 1.6s both;
+}
+@keyframes fade-up{
+  from{opacity:0;transform:translateY(20px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+.hero-divider{
+  position:relative;z-index:2;
+  margin:44px auto 0;display:flex;align-items:center;gap:20px;width:340px;
+  animation:fade-up 1s ease 1.8s both;
+}
+.hero-divider span{flex:1;height:1px;background:linear-gradient(90deg,transparent,#2a2a2a,transparent)}
+.hero-divider svg{width:16px;height:16px;fill:var(--gold);flex-shrink:0;filter:drop-shadow(0 0 8px rgba(201,162,39,0.5))}
+
+.hero-cta{
+  position:relative;z-index:2;margin-top:48px;
+  display:flex;gap:16px;animation:fade-up 1s ease 2s both;
+}
+
+/* ── BUTTONS ── */
+.btn{
+  display:inline-block;padding:14px 40px;
+  font-family:'Cinzel',serif;font-size:0.65rem;
+  letter-spacing:0.3em;text-transform:uppercase;text-decoration:none;
+  border:1px solid;transition:all 0.4s cubic-bezier(0.16,1,0.3,1);
+  cursor:pointer;background:transparent;position:relative;overflow:hidden;
+}
+.btn::before{
+  content:'';position:absolute;inset:0;
+  background:var(--chrome);transform:translateX(-101%);
+  transition:transform 0.4s cubic-bezier(0.16,1,0.3,1);z-index:-1;
+}
+.btn-primary{border-color:var(--chrome);color:var(--chrome)}
+.btn-primary:hover{color:var(--dark)}
+.btn-primary:hover::before{transform:translateX(0)}
+.btn-ghost{border-color:#2a2a2a;color:#555}
+.btn-ghost:hover{border-color:#555;color:#999}
+
+.scroll-cue{
+  position:absolute;bottom:36px;left:50%;transform:translateX(-50%);
+  z-index:2;display:flex;flex-direction:column;align-items:center;gap:10px;
+  color:#2a2a2a;font-size:0.55rem;letter-spacing:0.4em;text-transform:uppercase;
+  animation:cue-pulse 2.5s ease-in-out infinite alternate;
+}
+.scroll-cue .line{
+  width:1px;height:48px;
+  background:linear-gradient(180deg,transparent,#333);
+  animation:line-drop 2s ease-in-out infinite;
+}
+@keyframes cue-pulse{from{opacity:0.2}to{opacity:0.7}}
+@keyframes line-drop{
+  0%{transform:scaleY(0);transform-origin:top}
+  49%{transform:scaleY(1);transform-origin:top}
+  50%{transform:scaleY(1);transform-origin:bottom}
+  100%{transform:scaleY(0);transform-origin:bottom}
+}
+
+/* ── SECTION COMMONS ── */
+section{padding:120px 60px;position:relative;z-index:1}
+
+.reveal{opacity:0;transform:translateY(50px);transition:all 0.9s cubic-bezier(0.16,1,0.3,1)}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-left{opacity:0;transform:translateX(-60px);transition:all 0.9s cubic-bezier(0.16,1,0.3,1)}
+.reveal-left.visible{opacity:1;transform:translateX(0)}
+.reveal-right{opacity:0;transform:translateX(60px);transition:all 0.9s cubic-bezier(0.16,1,0.3,1)}
+.reveal-right.visible{opacity:1;transform:translateX(0)}
+
+.section-label{font-size:0.58rem;letter-spacing:0.5em;text-transform:uppercase;color:#333;margin-bottom:14px}
+.section-title{
+  font-family:'Cinzel',serif;font-size:clamp(1.7rem,3vw,2.6rem);
+  font-weight:700;color:var(--chrome);margin-bottom:20px;line-height:1.15;
+  text-shadow:0 0 60px rgba(255,255,255,0.08);
+}
+.section-title span{color:var(--gold);text-shadow:0 0 30px rgba(201,162,39,0.4)}
+.section-body{color:#484848;font-size:0.9rem;line-height:2;max-width:540px}
+.rule-line{width:50px;height:1px;background:var(--gold);margin-bottom:30px;box-shadow:0 0 12px rgba(201,162,39,0.5)}
+
+/* ── ABOUT ── */
+#about{background:var(--panel);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+#about .inner{max-width:1140px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:90px;align-items:center}
+
+.about-stats{display:grid;grid-template-columns:1fr 1fr;gap:3px}
+.stat-card{
+  border:1px solid var(--border);padding:32px 26px;
+  background:var(--dark);position:relative;overflow:hidden;
+  transform-style:preserve-3d;transition:all 0.5s cubic-bezier(0.16,1,0.3,1);
+  cursor:default;
+}
+.stat-card::before{
+  content:'';position:absolute;top:0;left:0;width:2px;height:100%;
+  background:linear-gradient(180deg,transparent,var(--gold),transparent);
+}
+.stat-card::after{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 50% 0%,rgba(201,162,39,0.05),transparent 70%);
+  opacity:0;transition:opacity 0.5s;
+}
+.stat-card:hover{transform:translateY(-6px) rotateX(5deg);border-color:#333}
+.stat-card:hover::after{opacity:1}
+.stat-num{font-family:'Cinzel Decorative',serif;font-size:2.2rem;color:var(--chrome);line-height:1;margin-bottom:8px}
+.stat-lbl{font-size:0.6rem;letter-spacing:0.35em;text-transform:uppercase;color:#333}
+
+/* ── GALLERY ── */
+#gallery{background:var(--dark)}
+#gallery .inner{max-width:1200px;margin:0 auto}
+#gallery .head{margin-bottom:72px;text-align:center}
+#gallery .head .section-body{margin:0 auto;text-align:center}
+#gallery .head .rule-line{margin:0 auto 30px}
+
+.member-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
+  gap:4px;
+}
+
+/* 3D flip card */
+.member-card{
+  perspective:900px;
+  height:340px;
+  cursor:pointer;
+}
+.member-card-inner{
+  position:relative;width:100%;height:100%;
+  transform-style:preserve-3d;
+  transition:transform 0.75s cubic-bezier(0.16,1,0.3,1);
+}
+.member-card:hover .member-card-inner{transform:rotateY(180deg)}
+
+.member-front,.member-back{
+  position:absolute;inset:0;
+  backface-visibility:hidden;
+  border:1px solid var(--border);
+  overflow:hidden;
+}
+
+/* FRONT — photo */
+.member-front{background:var(--panel)}
+.member-photo{
+  width:100%;height:100%;
+  object-fit:cover;
+  object-position:top;
+  display:block;
+  filter:grayscale(0.2) contrast(1.05);
+  transition:filter 0.4s,transform 0.6s;
+}
+.member-card:hover .member-photo{filter:grayscale(0) contrast(1.1)}
+
+/* placeholder when no photo */
+.member-photo-placeholder{
+  width:100%;height:100%;
+  background:linear-gradient(180deg,#0f0f0f 0%,#0a0a0a 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:14px;
+}
+.member-photo-placeholder svg{width:64px;height:64px;opacity:0.12}
+.member-photo-placeholder .ph-label{
+  font-size:0.6rem;letter-spacing:0.35em;color:#252525;text-transform:uppercase;
+}
+
+/* front overlay */
+.member-overlay{
+  position:absolute;bottom:0;left:0;right:0;
+  padding:20px 20px 18px;
+  background:linear-gradient(0deg,rgba(0,0,0,0.95) 0%,rgba(0,0,0,0.6) 60%,transparent 100%);
+}
+.member-rank-badge{
+  display:inline-block;padding:3px 10px;
+  font-family:'Cinzel',serif;font-size:0.55rem;letter-spacing:0.25em;
+  text-transform:uppercase;border:1px solid;margin-bottom:8px;
+}
+.member-rank-badge.gold  {border-color:var(--gold);color:var(--gold)}
+.member-rank-badge.silver{border-color:#555;color:#777}
+.member-rank-badge.grey  {border-color:#2a2a2a;color:#444}
+.member-name{
+  font-family:'Cinzel',serif;font-size:1rem;
+  color:var(--chrome);letter-spacing:0.06em;
+  text-shadow:0 2px 12px rgba(0,0,0,0.8);
+}
+.member-role{
+  font-size:0.68rem;color:#555;letter-spacing:0.12em;margin-top:4px;
+}
+
+/* BACK — info */
+.member-back{
+  background:var(--panel);
+  transform:rotateY(180deg);
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:32px 26px;text-align:center;
+  gap:14px;
+  position:relative;overflow:hidden;
+}
+.member-back::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 50% 0%,rgba(201,162,39,0.06),transparent 65%);
+}
+.member-back-name{
+  font-family:'Cinzel',serif;font-size:1.1rem;
+  color:var(--chrome);letter-spacing:0.08em;position:relative;
+}
+.member-back-rank{
+  font-family:'Cinzel',serif;font-size:0.62rem;
+  color:var(--gold);letter-spacing:0.3em;text-transform:uppercase;position:relative;
+}
+.member-back-divider{
+  width:36px;height:1px;background:var(--gold);
+  box-shadow:0 0 8px rgba(201,162,39,0.4);position:relative;
+}
+.member-back-desc{
+  font-size:0.76rem;color:#3d3d3d;line-height:1.8;position:relative;
+}
+.member-back-tag{
+  font-size:0.6rem;color:#2a2a2a;letter-spacing:0.3em;
+  text-transform:uppercase;position:absolute;bottom:18px;left:0;right:0;text-align:center;
+}
+
+/* upload hint on placeholder cards */
+.upload-hint{
+  position:absolute;top:14px;right:14px;
+  font-size:0.55rem;letter-spacing:0.2em;color:#222;
+  text-transform:uppercase;border:1px solid #1a1a1a;
+  padding:3px 8px;background:rgba(0,0,0,0.6);
+}
+
+/* rank badge reuse for back-compat */
+.rank-badge{
+  display:inline-block;padding:4px 12px;
+  font-family:'Cinzel',serif;font-size:0.58rem;letter-spacing:0.25em;
+  text-transform:uppercase;border:1px solid;margin-bottom:10px;width:fit-content;
+}
+.rank-badge.gold{border-color:var(--gold);color:var(--gold);box-shadow:0 0 12px rgba(201,162,39,0.15)}
+.rank-badge.silver{border-color:#555;color:#777}
+.rank-badge.grey{border-color:#2a2a2a;color:#444}
+
+/* ── 3D CARDS / TERRITORY ── */
+#territory{background:var(--panel);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+#territory .inner{max-width:1140px;margin:0 auto;display:grid;grid-template-columns:1fr 1.1fr;gap:80px;align-items:start}
+
+.zone-list{display:flex;flex-direction:column;gap:3px;margin-top:40px}
+.zone-item{
+  display:flex;align-items:center;gap:18px;
+  padding:18px 24px;border:1px solid var(--border);
+  background:var(--dark);transition:all 0.4s cubic-bezier(0.16,1,0.3,1);
+  position:relative;overflow:hidden;
+}
+.zone-item::after{
+  content:'';position:absolute;right:-20px;top:50%;
+  transform:translateY(-50%);
+  width:0;height:0;
+  border-style:solid;border-width:6px 0 6px 10px;
+  border-color:transparent transparent transparent var(--gold);
+  opacity:0;transition:all 0.3s;
+}
+.zone-item:hover{border-color:#2a2a2a;transform:translateX(8px);background:#080808}
+.zone-item:hover::after{opacity:1;right:20px}
+.zone-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;position:relative}
+.zone-dot::after{
+  content:'';position:absolute;inset:-4px;border-radius:50%;
+  border:1px solid currentColor;animation:ping 2s ease-out infinite;
+}
+@keyframes ping{0%{transform:scale(1);opacity:0.5}100%{transform:scale(2.8);opacity:0}}
+.zone-dot.controlled{background:#4caf50;color:#4caf50}
+.zone-dot.contested{background:#ff9800;color:#ff9800}
+.zone-dot.operations{background:var(--gold);color:var(--gold)}
+.zone-name{flex:1;font-family:'Cinzel',serif;font-size:0.8rem;letter-spacing:0.1em;color:#888}
+.zone-status{font-size:0.6rem;letter-spacing:0.25em;text-transform:uppercase;color:#333}
+
+/* 3D MAP */
+.map-scene{perspective:800px;height:440px}
+.map-wrap{
+  position:relative;height:100%;
+  border:1px solid var(--border);background:#060606;
+  overflow:hidden;display:flex;align-items:center;justify-content:center;
+  transform-style:preserve-3d;
+  transition:transform 0.1s ease;
+}
+.map-grid-lines{
+  position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,0.025) 1px,transparent 1px);
+  background-size:44px 44px;
+}
+.map-city{
+  position:relative;z-index:2;text-align:center;
+  transform:translateZ(20px);
+}
+.map-city .city{font-family:'Cinzel Decorative',serif;font-size:1.6rem;color:#161616;letter-spacing:0.35em}
+.map-city .state{font-size:0.6rem;letter-spacing:0.45em;color:#111;text-transform:uppercase;margin-top:10px}
+.map-pin{position:absolute;width:9px;height:9px;border-radius:50%}
+.map-pin::after{content:'';position:absolute;inset:-5px;border-radius:50%;border:1px solid currentColor;opacity:0.5;animation:ping 2s ease-out infinite}
+.pin-green{background:#4caf50;color:#4caf50;top:28%;left:42%}
+.pin-gold{background:var(--gold);color:var(--gold);top:52%;left:62%;animation-delay:.8s}
+.pin-orange{background:#ff9800;color:#ff9800;top:68%;left:32%;animation-delay:1.5s}
+.pin-red{background:#e53935;color:#e53935;top:40%;left:70%;animation-delay:.4s}
+
+/* glow corner */
+.map-corner{position:absolute;width:24px;height:24px;border-color:var(--gold);border-style:solid;opacity:0.4}
+.map-corner.tl{top:16px;left:16px;border-width:2px 0 0 2px}
+.map-corner.tr{top:16px;right:16px;border-width:2px 2px 0 0}
+.map-corner.bl{bottom:16px;left:16px;border-width:0 0 2px 2px}
+.map-corner.br{bottom:16px;right:16px;border-width:0 2px 2px 0}
+
+/* ── CODE ── */
+#code{background:var(--dark)}
+#code .inner{max-width:1140px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:90px}
+
+.rules-list{margin-top:44px;display:flex;flex-direction:column;gap:2px}
+.rule-item{
+  display:grid;grid-template-columns:52px 1fr;
+  border:1px solid var(--border);background:var(--panel);
+  transition:all 0.4s cubic-bezier(0.16,1,0.3,1);overflow:hidden;
+  position:relative;
+}
+.rule-item::before{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:0;
+  background:linear-gradient(180deg,transparent,rgba(201,162,39,0.04));
+  transition:height 0.4s;
+}
+.rule-item:hover{border-color:#252525;transform:translateX(4px)}
+.rule-item:hover::before{height:100%}
+.rule-num{
+  display:flex;align-items:center;justify-content:center;
+  border-right:1px solid var(--border);
+  font-family:'Cinzel',serif;font-size:0.68rem;color:var(--gold);
+  text-shadow:0 0 12px rgba(201,162,39,0.4);
+}
+.rule-text{padding:18px 22px;font-size:0.79rem;color:#404040;line-height:1.7}
+.rule-text strong{color:#666;font-weight:500}
+
+/* ── RECRUITMENT ── */
+#recruitment{
+  background:var(--panel);
+  border-top:1px solid var(--border);
+  text-align:center;
+}
+#recruitment .inner{max-width:900px;margin:0 auto}
+#recruitment .section-body{max-width:100%;margin:0 auto 52px}
+
+/* ── APPLICATION FORM ── */
+.app-form-wrap{
+  margin-top:60px;text-align:left;
+  border:1px solid var(--border);
+  background:var(--dark);
+  position:relative;overflow:hidden;
+}
+.app-form-wrap::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+  opacity:0.4;
+}
+.app-form-header{
+  padding:28px 36px 24px;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:16px;
+}
+.app-form-header svg{width:18px;height:18px;fill:var(--gold);flex-shrink:0;filter:drop-shadow(0 0 6px rgba(201,162,39,0.5))}
+.app-form-title{
+  font-family:'Cinzel',serif;font-size:0.78rem;
+  letter-spacing:0.25em;text-transform:uppercase;color:var(--chrome);
+}
+.app-form-subtitle{font-size:0.65rem;color:#333;letter-spacing:0.15em;margin-top:3px}
+
+.app-form{padding:32px 36px 36px;display:flex;flex-direction:column;gap:20px}
+
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-row.full{grid-template-columns:1fr}
+
+.form-field{display:flex;flex-direction:column;gap:8px}
+.form-label{
+  font-size:0.62rem;letter-spacing:0.3em;text-transform:uppercase;
+  color:#3a3a3a;font-family:'Cinzel',serif;
+  display:flex;align-items:center;gap:6px;
+}
+.form-label .req{color:var(--gold);font-size:0.7rem;line-height:1}
+
+.form-input,.form-textarea,.form-select{
+  background:#080808;border:1px solid #1a1a1a;
+  color:#888;font-family:'Raleway',sans-serif;font-size:0.82rem;
+  padding:13px 16px;outline:none;width:100%;
+  transition:border-color 0.3s,color 0.3s,box-shadow 0.3s;
+  appearance:none;
+}
+.form-input::placeholder,.form-textarea::placeholder{color:#252525}
+.form-input:focus,.form-textarea:focus,.form-select:focus{
+  border-color:#333;color:#bbb;
+  box-shadow:0 0 0 1px rgba(201,162,39,0.08) inset;
+}
+.form-textarea{resize:vertical;min-height:100px;line-height:1.7}
+.form-select{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 10 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23333'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;background-size:8px}
+.form-select option{background:#0a0a0a}
+
+.form-divider{
+  height:1px;background:linear-gradient(90deg,transparent,#1a1a1a,transparent);
+  margin:4px 0;
+}
+
+.form-footer{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-top:8px;flex-wrap:wrap;gap:16px;
+}
+.form-note{font-size:0.62rem;color:#222;letter-spacing:0.15em}
+
+.btn-submit{
+  display:inline-flex;align-items:center;gap:10px;
+  padding:14px 38px;border:1px solid var(--gold);
+  font-family:'Cinzel',serif;font-size:0.65rem;
+  letter-spacing:0.28em;text-transform:uppercase;
+  color:var(--gold);background:transparent;cursor:pointer;
+  transition:all 0.4s cubic-bezier(0.16,1,0.3,1);
+  position:relative;overflow:hidden;
+}
+.btn-submit::before{
+  content:'';position:absolute;inset:0;
+  background:var(--gold);transform:translateX(-101%);
+  transition:transform 0.4s cubic-bezier(0.16,1,0.3,1);z-index:0;
+}
+.btn-submit:hover{color:var(--dark)}
+.btn-submit:hover::before{transform:translateX(0)}
+.btn-submit span,.btn-submit svg{position:relative;z-index:1}
+.btn-submit svg{width:14px;height:14px;fill:currentColor}
+
+/* success state */
+.form-success{
+  display:none;padding:64px 40px;text-align:center;
+  position:relative;overflow:hidden;min-height:340px;
+  align-items:center;justify-content:center;flex-direction:column;gap:0;
+}
+.form-success::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 70% 60% at 50% 40%,rgba(201,162,39,0.06) 0%,transparent 70%);
+}
+.form-success.show{display:flex}
+
+/* animated ring burst */
+.success-rings{
+  position:relative;width:100px;height:100px;
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:32px;flex-shrink:0;
+}
+.success-rings::before,.success-rings::after{
+  content:'';position:absolute;border-radius:50%;border:1px solid var(--gold);
+  animation:ring-expand 2s ease-out infinite;
+}
+.success-rings::before{width:100%;height:100%;animation-delay:0s;opacity:0.4}
+.success-rings::after {width:100%;height:100%;animation-delay:0.7s;opacity:0.2}
+@keyframes ring-expand{
+  0%  {transform:scale(0.6);opacity:0.6}
+  100%{transform:scale(2.2);opacity:0}
+}
+.success-emblem{
+  position:relative;z-index:2;
+  width:80px;height:80px;
+  border:1px solid rgba(201,162,39,0.4);
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(201,162,39,0.05);
+  box-shadow:0 0 40px rgba(201,162,39,0.15),inset 0 0 20px rgba(201,162,39,0.05);
+  animation:emblem-in 0.8s cubic-bezier(0.16,1,0.3,1) both;
+}
+@keyframes emblem-in{
+  from{transform:scale(0.3) rotate(-180deg);opacity:0}
+  to  {transform:scale(1)   rotate(0deg);  opacity:1}
+}
+.success-emblem svg{width:32px;height:32px;fill:var(--gold);filter:drop-shadow(0 0 8px rgba(201,162,39,0.6))}
+
+.success-status{
+  font-size:0.58rem;letter-spacing:0.55em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:14px;
+  animation:fade-up 0.7s ease 0.3s both;
+  text-shadow:0 0 20px rgba(201,162,39,0.4);
+}
+.success-title{
+  font-family:'Cinzel Decorative',serif;
+  font-size:clamp(1.1rem,2.5vw,1.6rem);
+  letter-spacing:0.08em;color:var(--chrome);
+  margin-bottom:20px;line-height:1.3;
+  text-shadow:0 0 40px rgba(255,255,255,0.1);
+  animation:fade-up 0.7s ease 0.45s both;
+}
+.success-divider{
+  display:flex;align-items:center;gap:14px;
+  width:280px;margin:0 auto 22px;
+  animation:fade-up 0.7s ease 0.55s both;
+}
+.success-divider span{flex:1;height:1px;background:linear-gradient(90deg,transparent,#2a2a2a,transparent)}
+.success-divider svg{width:10px;height:10px;fill:var(--gold);flex-shrink:0}
+
+.success-body{
+  font-size:0.85rem;color:#484848;line-height:2;
+  max-width:420px;margin:0 auto 28px;
+  animation:fade-up 0.7s ease 0.65s both;
+}
+.success-body strong{color:#666;font-weight:500}
+
+.success-tags{
+  display:flex;gap:8px;flex-wrap:wrap;justify-content:center;
+  animation:fade-up 0.7s ease 0.75s both;
+}
+.success-tag{
+  padding:5px 14px;border:1px solid #1e1e1e;
+  font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:#333;
+}
+
+/* scan line effect on success */
+.success-scan{
+  position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,rgba(201,162,39,0.4),transparent);
+  animation:scan-line 3s ease-in-out infinite;
+}
+@keyframes scan-line{
+  0%  {top:0;   opacity:0}
+  10% {opacity:1}
+  90% {opacity:1}
+  100%{top:100%;opacity:0}
+}
+
+.req-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;margin-bottom:52px;text-align:left}
+.req-card{
+  border:1px solid var(--border);background:var(--dark);padding:34px 28px;
+  transform-style:preserve-3d;transition:all 0.5s cubic-bezier(0.16,1,0.3,1);
+  position:relative;overflow:hidden;cursor:default;
+}
+.req-card::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 50% 0%,rgba(201,162,39,0.06),transparent 60%);
+  opacity:0;transition:opacity 0.5s;
+}
+.req-card:hover{transform:translateY(-10px) rotateX(6deg) rotateY(-2deg);border-color:#2a2a2a}
+.req-card:hover::before{opacity:1}
+.req-icon{font-size:1.6rem;margin-bottom:16px;display:block;filter:grayscale(0.5)}
+.req-title{font-family:'Cinzel',serif;font-size:0.76rem;letter-spacing:0.18em;color:var(--chrome);margin-bottom:12px;text-transform:uppercase}
+.req-body{font-size:0.77rem;color:#3d3d3d;line-height:1.8}
+
+/* ── GLITCH TEXT ── */
+.glitch{position:relative;display:inline-block}
+.glitch::before,.glitch::after{
+  content:attr(data-text);position:absolute;top:0;left:0;width:100%;height:100%;
+  font-family:inherit;font-size:inherit;font-weight:inherit;color:inherit;
+}
+.glitch::before{
+  left:2px;text-shadow:-1px 0 var(--gold);
+  animation:glitch-1 3s infinite linear;clip-path:polygon(0 0,100% 0,100% 35%,0 35%);
+}
+.glitch::after{
+  left:-2px;text-shadow:-1px 0 rgba(255,50,50,0.4);
+  animation:glitch-2 3s infinite linear;clip-path:polygon(0 65%,100% 65%,100% 100%,0 100%);
+}
+@keyframes glitch-1{
+  0%,92%,100%{transform:none;opacity:0}
+  93%{transform:translate(-2px,1px) skewX(-2deg);opacity:0.8}
+  95%{transform:translate(2px,-1px) skewX(1deg);opacity:0.6}
+  97%{transform:translate(-1px,2px);opacity:0.4}
+}
+@keyframes glitch-2{
+  0%,94%,100%{transform:none;opacity:0}
+  95%{transform:translate(2px,-1px) skewX(2deg);opacity:0.7}
+  98%{transform:translate(-2px,1px);opacity:0.3}
+}
+
+/* ── 3D MODEL SECTION ── */
+#model-section{
+  position:relative;background:var(--dark);
+  border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+  padding:0;overflow:hidden;min-height:500px;
+  display:flex;align-items:center;
+}
+#model-section::before{
+  content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 60% 80% at 30% 50%,rgba(201,162,39,0.04) 0%,transparent 70%),
+    radial-gradient(ellipse 50% 60% at 75% 50%,rgba(139,0,0,0.06) 0%,transparent 70%);
+  pointer-events:none;
+}
+.model-inner{
+  max-width:1140px;margin:0 auto;padding:80px 60px;
+  display:grid;grid-template-columns:1fr 1fr;gap:60px;
+  align-items:center;width:100%;
+}
+#model-canvas{
+  width:100%;height:420px;display:block;
+  filter:drop-shadow(0 0 60px rgba(201,162,39,0.12));
+}
+.model-text{padding-left:20px}
+.model-text .section-body{color:#3d3d3d}
+
+/* ── DESIGN: hero atmosphere ── */
+#hero::after{
+  content:'';position:absolute;
+  bottom:0;left:0;right:0;height:200px;
+  background:linear-gradient(0deg,var(--dark),transparent);
+  pointer-events:none;z-index:1;
+}
+.hero-glow{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  width:600px;height:600px;border-radius:50%;
+  background:radial-gradient(circle,rgba(201,162,39,0.04) 0%,rgba(139,0,0,0.03) 40%,transparent 70%);
+  pointer-events:none;z-index:0;
+  animation:glow-pulse 5s ease-in-out infinite alternate;
+}
+@keyframes glow-pulse{
+  from{transform:translate(-50%,-50%) scale(0.9);opacity:0.5}
+  to{transform:translate(-50%,-50%) scale(1.15);opacity:1}
+}
+
+/* ── DESIGN: section accents ── */
+#about::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(201,162,39,0.3),transparent);
+}
+#about{position:relative}
+#territory::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(201,162,39,0.2),transparent);
+}
+#territory{position:relative}
+
+/* ── DESIGN: red accent lines ── */
+.red-accent{
+  width:2px;height:60px;
+  background:linear-gradient(180deg,transparent,rgba(139,0,0,0.6),transparent);
+  margin:0 auto;
+}
+
+/* form cooldown notice */
+.cooldown-msg{
+  padding:16px 20px;border:1px solid rgba(139,0,0,0.3);
+  background:rgba(139,0,0,0.06);
+  font-size:0.76rem;color:#5a2a2a;line-height:1.7;
+  display:none;
+}
+.cooldown-msg.show{display:block}
+.cooldown-time{color:#8b3333;font-weight:600;font-family:'Cinzel',serif}
+
+/* ── FOOTER ── */
+footer{
+  background:var(--dark);border-top:1px solid var(--border);
+  padding:52px 60px;display:flex;align-items:center;justify-content:space-between;
+  position:relative;z-index:1;
+}
+.footer-brand{font-family:'Cinzel Decorative',serif;font-size:0.9rem;letter-spacing:0.35em;color:#222}
+.footer-copy{font-size:0.6rem;letter-spacing:0.2em;color:#1a1a1a;text-transform:uppercase}
+footer::before{content:'';position:absolute;top:0;left:60px;right:60px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:0.15}
+
+/* ── RESPONSIVE ── */
+@media(max-width:960px){
+  nav{padding:0 24px}
+  .nav-links{gap:24px}
+  section{padding:80px 24px}
+  #about .inner,#territory .inner,#code .inner{grid-template-columns:1fr;gap:52px}
+  .member-grid{grid-template-columns:repeat(2,1fr)}
+  .req-grid{grid-template-columns:1fr}
+  footer{flex-direction:column;gap:16px;text-align:center}
+}
+@media(max-width:600px){
+  .nav-links{display:none}
+  .hero-cta{flex-direction:column;align-items:center}
+  .about-stats{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursor-ring"></div>
+<canvas id="bg-canvas"></canvas>
+
+<!-- ── DISCORD LOGIN OVERLAY ── -->
+<div id="login-overlay">
+  <div class="login-box">
+    <!-- логотип -->
+    <svg class="login-logo" viewBox="0 0 600 200" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="lc" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stop-color="#fff" stop-opacity="0.95"/>
+          <stop offset="18%"  stop-color="#c8c8c8"/>
+          <stop offset="38%"  stop-color="#f5f5f5"/>
+          <stop offset="55%"  stop-color="#888"/>
+          <stop offset="72%"  stop-color="#e0e0e0"/>
+          <stop offset="100%" stop-color="#d8d8d8"/>
+        </linearGradient>
+        <linearGradient id="le" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stop-color="#fff" stop-opacity="0.5"/>
+          <stop offset="50%"  stop-color="#fff" stop-opacity="0"/>
+          <stop offset="100%" stop-color="#fff" stop-opacity="0.12"/>
+        </linearGradient>
+        <filter id="lg"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        <filter id="ls"><feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000" flood-opacity="0.9"/></filter>
+      </defs>
+      <g opacity="0.5" fill="url(#lc)">
+        <polygon points="300,8 304,22 300,18 296,22"/>
+        <polygon points="300,14 308,28 300,24 292,28"/>
+        <polygon points="240,30 244,42 240,38 236,42" opacity="0.4"/>
+        <polygon points="360,30 364,42 360,38 356,42" opacity="0.4"/>
+        <polygon points="160,60 220,52 180,68" opacity="0.25"/>
+        <polygon points="440,60 380,52 420,68" opacity="0.25"/>
+      </g>
+      <text x="300" y="140" text-anchor="middle" font-family="'Cinzel Decorative','Times New Roman',serif" font-weight="900" font-size="108" letter-spacing="6" fill="#000" filter="url(#ls)" opacity="0.9">BLANCH</text>
+      <text x="300" y="140" text-anchor="middle" font-family="'Cinzel Decorative','Times New Roman',serif" font-weight="900" font-size="108" letter-spacing="6" fill="url(#lc)" filter="url(#lg)">BLANCH</text>
+      <text x="300" y="140" text-anchor="middle" font-family="'Cinzel Decorative','Times New Roman',serif" font-weight="900" font-size="108" letter-spacing="6" fill="url(#le)" opacity="0.45">BLANCH</text>
+      <line x1="90"  y1="158" x2="230" y2="152" stroke="url(#lc)" stroke-width="1" opacity="0.2"/>
+      <line x1="510" y1="158" x2="370" y2="152" stroke="url(#lc)" stroke-width="1" opacity="0.2"/>
+    </svg>
+
+    <div class="login-divider">
+      <span></span>
+      <svg viewBox="0 0 24 24"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg>
+      <span></span>
+    </div>
+
+    <!-- состояние 1: кнопка входа -->
+    <div id="state-login">
+      <p class="login-title">Лос-Сантос · Вступление открыто</p>
+      <p class="login-desc">Семья Бланч принимает всех достойных.<br/>Войди через Discord чтобы подать заявку или узнать о нас больше.</p>
+
+      <button class="btn-discord" id="login-btn">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/>
+        </svg>
+        Войти через Discord
+      </button>
+
+      <p class="login-note">Запрашиваем только имя и аватар · Доступ строго по списку</p>
+    </div>
+
+    <!-- состояние 2: проверка -->
+    <div class="login-checking" id="state-checking">
+      <div class="checking-spinner"></div>
+      <div class="checking-text">Проверяем доступ...</div>
+    </div>
+
+    <!-- состояние 3: отказ -->
+    <div class="login-denied" id="state-denied">
+      <img class="denied-avatar" id="denied-avatar" alt=""/>
+      <div class="denied-user" id="denied-user"></div>
+      <div class="denied-badge">⛔ Доступ запрещён</div>
+      <p class="denied-msg">
+        Твой Discord аккаунт <strong>не числится</strong> в списке членов и союзников семьи Бланч.<br/><br/>
+        Если ты считаешь это ошибкой — обратись к члену семьи в городе.
+      </p>
+      <button class="btn-logout" id="btn-logout">Войти с другого аккаунта</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── NAV ── -->
+<nav>
+  <a class="nav-brand" href="#hero">Blanch</a>
+  <ul class="nav-links">
+    <li><a href="#about">О нас</a></li>
+    <li><a href="#gallery">Состав</a></li>
+    <li><a href="#territory">Территория</a></li>
+    <li><a href="#code">Кодекс</a></li>
+    <li><a href="#recruitment">Вступление</a></li>
+  </ul>
+</nav>
+
+<!-- ── HERO ── -->
+<section id="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-logo-wrap" id="hero3d">
+    <!-- если положишь blanch-logo.png в папку — раскомментируй img и удали svg -->
+    <!-- <img class="hero-logo" src="blanch-logo.png" alt="BLANCH"/> -->
+    <svg class="hero-logo" viewBox="0 0 600 200" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <!-- chrome gradient -->
+        <linearGradient id="chrome" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stop-color="#ffffff" stop-opacity="0.95"/>
+          <stop offset="18%"  stop-color="#c8c8c8"/>
+          <stop offset="38%"  stop-color="#f5f5f5"/>
+          <stop offset="55%"  stop-color="#888"/>
+          <stop offset="72%"  stop-color="#e0e0e0"/>
+          <stop offset="88%"  stop-color="#aaa"/>
+          <stop offset="100%" stop-color="#d8d8d8"/>
+        </linearGradient>
+        <!-- inner glow filter -->
+        <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <filter id="shadow">
+          <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000" flood-opacity="0.8"/>
+        </filter>
+        <!-- sharp chrome edge -->
+        <linearGradient id="edge" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stop-color="#fff" stop-opacity="0.6"/>
+          <stop offset="50%"  stop-color="#fff" stop-opacity="0"/>
+          <stop offset="100%" stop-color="#fff" stop-opacity="0.15"/>
+        </linearGradient>
+      </defs>
+
+      <!-- decorative top spike -->
+      <g opacity="0.55" fill="url(#chrome)">
+        <polygon points="300,8 304,22 300,18 296,22"/>
+        <polygon points="300,14 308,28 300,24 292,28"/>
+        <!-- small side ornaments -->
+        <polygon points="240,30 244,42 240,38 236,42" opacity="0.4"/>
+        <polygon points="360,30 364,42 360,38 356,42" opacity="0.4"/>
+        <!-- wing left -->
+        <polygon points="160,60 220,52 180,68" opacity="0.3"/>
+        <!-- wing right -->
+        <polygon points="440,60 380,52 420,68" opacity="0.3"/>
+      </g>
+
+      <!-- main text shadow layer -->
+      <text x="300" y="140"
+        text-anchor="middle"
+        font-family="'Cinzel Decorative', 'Times New Roman', serif"
+        font-weight="900"
+        font-size="108"
+        letter-spacing="6"
+        fill="#000"
+        filter="url(#shadow)"
+        opacity="0.9">BLANCH</text>
+
+      <!-- main chrome text -->
+      <text x="300" y="140"
+        text-anchor="middle"
+        font-family="'Cinzel Decorative', 'Times New Roman', serif"
+        font-weight="900"
+        font-size="108"
+        letter-spacing="6"
+        fill="url(#chrome)"
+        filter="url(#glow)">BLANCH</text>
+
+      <!-- highlight sheen overlay -->
+      <text x="300" y="140"
+        text-anchor="middle"
+        font-family="'Cinzel Decorative', 'Times New Roman', serif"
+        font-weight="900"
+        font-size="108"
+        letter-spacing="6"
+        fill="url(#edge)"
+        opacity="0.5">BLANCH</text>
+
+      <!-- decorative bottom spike mirror -->
+      <g opacity="0.4" fill="url(#chrome)" transform="translate(300,165) scale(1,-0.6) translate(-300,-20)">
+        <polygon points="300,8 304,22 300,18 296,22"/>
+        <polygon points="300,14 308,28 300,24 292,28"/>
+      </g>
+
+      <!-- bottom wing lines -->
+      <line x1="90" y1="158" x2="230" y2="152" stroke="url(#chrome)" stroke-width="1" opacity="0.25"/>
+      <line x1="510" y1="158" x2="370" y2="152" stroke="url(#chrome)" stroke-width="1" opacity="0.25"/>
+      <line x1="70" y1="162" x2="230" y2="158" stroke="url(#chrome)" stroke-width="0.5" opacity="0.12"/>
+      <line x1="530" y1="162" x2="370" y2="158" stroke="url(#chrome)" stroke-width="0.5" opacity="0.12"/>
+    </svg>
+  </div>
+
+  <p class="hero-subtitle">Осн. Сан-Андреас &nbsp;·&nbsp; Лос-Сантос</p>
+  <p class="hero-tagline">«Кровь превыше всего. Верность превыше жизни.»</p>
+
+  <div class="hero-divider">
+    <span></span>
+    <svg viewBox="0 0 24 24"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg>
+    <span></span>
+  </div>
+
+  <div class="hero-cta">
+    <a href="#recruitment" class="btn btn-primary">Вступить в семью</a>
+    <a href="#about" class="btn btn-ghost">Узнать больше</a>
+  </div>
+
+  <div class="scroll-cue">
+    <div class="line"></div>
+    Scroll
+  </div>
+</section>
+
+<!-- ── ABOUT ── -->
+<section id="about">
+  <div class="inner">
+    <div class="reveal-left">
+      <p class="section-label">Кто мы такие</p>
+      <div class="rule-line"></div>
+      <h2 class="section-title">Семья <span>Бланч</span></h2>
+      <p class="section-body">
+        Рождённые на улицах Южного ЛС, семья Бланч поднялась через кровь,
+        дисциплину и кодекс, который никогда не нарушался. Мы не гоняемся
+        за властью — власть приходит к тем, кто умеет внушать уважение.
+        Каждый член носит это имя с умыслом. Каждый поступок отражает семью.
+        Мы не банда. Мы — династия.
+      </p>
+      <br/>
+      <p class="section-body">
+        В Лос-Сантосе, где союзы меняются как песок, имя Бланч остаётся
+        неизменным. Мы строим, защищаем и при необходимости — взыскиваем.
+      </p>
+    </div>
+
+    <div class="about-stats reveal-right">
+      <div class="stat-card">
+        <div class="stat-num">I</div>
+        <div class="stat-lbl">Активный чаптер</div>
       </div>
-    </section>
+      <div class="stat-card" style="transition-delay:0.1s">
+        <div class="stat-num">24/7</div>
+        <div class="stat-lbl">Операции</div>
+      </div>
+      <div class="stat-card" style="transition-delay:0.2s">
+        <div class="stat-num">0</div>
+        <div class="stat-lbl">Терпимость к крысам</div>
+      </div>
+      <div class="stat-card" style="transition-delay:0.3s">
+        <div class="stat-num">∞</div>
+        <div class="stat-lbl">Верность</div>
+      </div>
+    </div>
+  </div>
+</section>
 
-    <header class="site-header app-shell" hidden>
-      <a class="brand" href="#top" aria-label="BLANCH">
-        <span class="brand-mark">B</span>
-        <span>BLANCH</span>
-      </a>
-      <nav class="nav" aria-label="Главная навигация">
-        <a href="#family">Семья</a>
-        <a href="#photos">Фото</a>
-        <a href="#rules">Правила</a>
-        <a href="#join">Вступить</a>
-      </nav>
-      <div class="header-actions">
-        <button class="top-back" id="backToMain" type="button" hidden>На главный экран</button>
-        <div class="user-menu" id="userMenu">
-          <button class="user-button" id="userButton" type="button">
-            <img class="user-avatar" id="userAvatar" alt="" />
-            <span id="userName">Discord</span>
+<!-- ── 3D MODEL ── -->
+<section id="model-section">
+  <div class="model-inner">
+    <canvas id="model-canvas"></canvas>
+    <div class="model-text reveal-right">
+      <p class="section-label">Символ семьи</p>
+      <div class="rule-line"></div>
+      <h2 class="section-title">Сила &amp; <span>Честь</span></h2>
+      <p class="section-body">
+        Узел — древний символ единства. Не имеет начала и конца.
+        Как и семья Бланч — мы нерушимы, непрерывны
+        и связаны одной клятвой навсегда.
+      </p>
+      <br/>
+      <div class="red-accent"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── GALLERY ── -->
+<section id="gallery">
+  <div class="inner">
+    <div class="head reveal">
+      <p class="section-label">Состав семьи</p>
+      <div class="rule-line"></div>
+      <h2 class="section-title">Наши <span class="glitch" data-text="Люди">Люди</span></h2>
+      <p class="section-body">
+        Каждый здесь заработал своё место. Наведи на карточку — узнаешь больше.
+        Чтобы добавить реальное фото — замени <em>src</em> на путь к своему изображению.
+      </p>
+    </div>
+
+    <div class="member-grid">
+
+      <!-- КАРТОЧКА 1 — с заглушкой. Замени src на свою фотку -->
+      <div class="member-card reveal" style="transition-delay:0.05s">
+        <div class="member-card-inner">
+          <div class="member-front">
+            <!-- <img class="member-photo" src="photos/boss.jpg" alt="Босс"/> -->
+            <div class="member-photo-placeholder">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+              <span class="ph-label">Добавить фото</span>
+            </div>
+            <div class="upload-hint">+ фото</div>
+            <div class="member-overlay">
+              <span class="member-rank-badge gold">Босс</span>
+              <div class="member-name">Имя Персонажа</div>
+              <div class="member-role">Дон семьи Бланч</div>
+            </div>
+          </div>
+          <div class="member-back">
+            <div class="member-back-name">Имя Персонажа</div>
+            <div class="member-back-rank">Босс / Дон</div>
+            <div class="member-back-divider"></div>
+            <div class="member-back-desc">Абсолютный глава. Последнее слово во всём — война, мир, дисциплина. Имя, стоящее за именем.</div>
+            <span class="member-back-tag">Наведи ещё раз — вернуться</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- КАРТОЧКА 2 -->
+      <div class="member-card reveal" style="transition-delay:0.1s">
+        <div class="member-card-inner">
+          <div class="member-front">
+            <div class="member-photo-placeholder">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+              <span class="ph-label">Добавить фото</span>
+            </div>
+            <div class="upload-hint">+ фото</div>
+            <div class="member-overlay">
+              <span class="member-rank-badge gold">Андербосс</span>
+              <div class="member-name">Имя Персонажа</div>
+              <div class="member-role">Правая рука Дона</div>
+            </div>
+          </div>
+          <div class="member-back">
+            <div class="member-back-name">Имя Персонажа</div>
+            <div class="member-back-rank">Андербосс</div>
+            <div class="member-back-divider"></div>
+            <div class="member-back-desc">Руководит ежедневными операциями. Командует капо и проводит волю семьи во всех секторах.</div>
+            <span class="member-back-tag">Наведи ещё раз — вернуться</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- КАРТОЧКА 3 -->
+      <div class="member-card reveal" style="transition-delay:0.15s">
+        <div class="member-card-inner">
+          <div class="member-front">
+            <div class="member-photo-placeholder">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+              <span class="ph-label">Добавить фото</span>
+            </div>
+            <div class="upload-hint">+ фото</div>
+            <div class="member-overlay">
+              <span class="member-rank-badge gold">Консильери</span>
+              <div class="member-name">Имя Персонажа</div>
+              <div class="member-role">Советник семьи</div>
+            </div>
+          </div>
+          <div class="member-back">
+            <div class="member-back-name">Имя Персонажа</div>
+            <div class="member-back-rank">Консильери</div>
+            <div class="member-back-divider"></div>
+            <div class="member-back-desc">Доверенный голос разума за столом. Управляет альянсами, переговорами и стратегией семьи.</div>
+            <span class="member-back-tag">Наведи ещё раз — вернуться</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- КАРТОЧКА 4 -->
+      <div class="member-card reveal" style="transition-delay:0.2s">
+        <div class="member-card-inner">
+          <div class="member-front">
+            <div class="member-photo-placeholder">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+              <span class="ph-label">Добавить фото</span>
+            </div>
+            <div class="upload-hint">+ фото</div>
+            <div class="member-overlay">
+              <span class="member-rank-badge silver">Капо</span>
+              <div class="member-name">Имя Персонажа</div>
+              <div class="member-role">Командир бригады</div>
+            </div>
+          </div>
+          <div class="member-back">
+            <div class="member-back-name">Имя Персонажа</div>
+            <div class="member-back-rank">Капо</div>
+            <div class="member-back-divider"></div>
+            <div class="member-back-desc">Возглавляет бригаду солдат. Отвечает за конкретный район или операцию. Подчиняется андербоссу.</div>
+            <span class="member-back-tag">Наведи ещё раз — вернуться</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- КАРТОЧКА 5 -->
+      <div class="member-card reveal" style="transition-delay:0.25s">
+        <div class="member-card-inner">
+          <div class="member-front">
+            <div class="member-photo-placeholder">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+              <span class="ph-label">Добавить фото</span>
+            </div>
+            <div class="upload-hint">+ фото</div>
+            <div class="member-overlay">
+              <span class="member-rank-badge silver">Солдат</span>
+              <div class="member-name">Имя Персонажа</div>
+              <div class="member-role">Сделанный человек</div>
+            </div>
+          </div>
+          <div class="member-back">
+            <div class="member-back-name">Имя Персонажа</div>
+            <div class="member-back-rank">Солдат</div>
+            <div class="member-back-divider"></div>
+            <div class="member-back-desc">Полноправный член семьи. Прошёл посвящение. Ведёт операции, взыскивает долги, защищает интересы.</div>
+            <span class="member-back-tag">Наведи ещё раз — вернуться</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- КАРТОЧКА 6 -->
+      <div class="member-card reveal" style="transition-delay:0.3s">
+        <div class="member-card-inner">
+          <div class="member-front">
+            <div class="member-photo-placeholder">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+              <span class="ph-label">Добавить фото</span>
+            </div>
+            <div class="upload-hint">+ фото</div>
+            <div class="member-overlay">
+              <span class="member-rank-badge grey">Ассоциат</span>
+              <div class="member-name">Имя Персонажа</div>
+              <div class="member-role">На испытании</div>
+            </div>
+          </div>
+          <div class="member-back">
+            <div class="member-back-name">Имя Персонажа</div>
+            <div class="member-back-rank">Ассоциат</div>
+            <div class="member-back-divider"></div>
+            <div class="member-back-desc">Испытательный ранг. Работает на доверие к семье. Прикреплён к солдату. Здесь зарабатывается место.</div>
+            <span class="member-back-tag">Наведи ещё раз — вернуться</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── TERRITORY ── -->
+<section id="territory">
+  <div class="inner">
+    <div class="reveal-left">
+      <p class="section-label">Наша земля</p>
+      <div class="rule-line"></div>
+      <h2 class="section-title">Территории &amp; <span>Операции</span></h2>
+      <p class="section-body">
+        Семья Бланч контролирует ключевые коридоры по всему Лос-Сантосу.
+        Каждый квартал — заработан, а не подарен. За нарушение границ разбираются соответственно.
+      </p>
+      <div class="zone-list">
+        <div class="zone-item"><div class="zone-dot controlled"></div><div class="zone-name">Маленький Сеул</div><div class="zone-status">Под контролем</div></div>
+        <div class="zone-item"><div class="zone-dot controlled"></div><div class="zone-name">Доки Ла-Меса</div><div class="zone-status">Под контролем</div></div>
+        <div class="zone-item"><div class="zone-dot operations"></div><div class="zone-name">Пилбокс-Хилл</div><div class="zone-status">Операции</div></div>
+        <div class="zone-item"><div class="zone-dot operations"></div><div class="zone-name">Зеркальный Парк</div><div class="zone-status">Операции</div></div>
+        <div class="zone-item"><div class="zone-dot contested"></div><div class="zone-name">Клубника (Strawberry)</div><div class="zone-status">Спорная зона</div></div>
+        <div class="zone-item"><div class="zone-dot controlled"></div><div class="zone-name">Сайпресс Флэтс</div><div class="zone-status">Под контролем</div></div>
+      </div>
+    </div>
+
+    <div class="map-scene reveal-right">
+      <div class="map-wrap" id="map3d">
+        <div class="map-grid-lines"></div>
+        <div class="map-city">
+          <div class="city">ЛОС-САНТОС</div>
+          <div class="state">Сан-Андреас · GTA V RP</div>
+        </div>
+        <div class="map-pin pin-green"></div>
+        <div class="map-pin pin-gold"></div>
+        <div class="map-pin pin-orange"></div>
+        <div class="map-pin pin-red"></div>
+        <div class="map-corner tl"></div>
+        <div class="map-corner tr"></div>
+        <div class="map-corner bl"></div>
+        <div class="map-corner br"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CODE ── -->
+<section id="code">
+  <div class="inner">
+    <div class="reveal-left">
+      <p class="section-label">Кодекс</p>
+      <div class="rule-line"></div>
+      <h2 class="section-title">Законы <span>Семьи</span></h2>
+      <p class="section-body">
+        Это не рекомендации. Кодекс — это то, что отделяет нас от уличного мусора.
+        Нарушь его однажды — получишь последствия.
+        Нарушь дважды — второго раза не будет.
+      </p>
+    </div>
+
+    <div class="rules-list reveal-right">
+      <div class="rule-item"><div class="rule-num">01</div><div class="rule-text"><strong>Омерта прежде всего.</strong> Что происходит в семье — остаётся в семье. Никакая информация не выходит наружу — никогда.</div></div>
+      <div class="rule-item"><div class="rule-num">02</div><div class="rule-text"><strong>Кровь дороже денег.</strong> Никакой контракт, сделка или долг не стоит предательства своих.</div></div>
+      <div class="rule-item"><div class="rule-num">03</div><div class="rule-text"><strong>Ранг уважается.</strong> Следуй цепочке командования. Говори не в свою очередь — будешь поправлен.</div></div>
+      <div class="rule-item"><div class="rule-num">04</div><div class="rule-text"><strong>Никакой самодеятельности.</strong> Все операции — через капо. Личные дела, ставящие семью под угрозу, наказуемы.</div></div>
+      <div class="rule-item"><div class="rule-num">05</div><div class="rule-text"><strong>С врагами разбираются аккуратно.</strong> Никаких публичных взрывов, никакой грязной работы. Дискреция — это выживание.</div></div>
+      <div class="rule-item"><div class="rule-num">06</div><div class="rule-text"><strong>Гражданские — неприкосновенны.</strong> Мы не воюем против невиновных. Это привлекает внимание, которое нам не нужно.</div></div>
+      <div class="rule-item"><div class="rule-num">07</div><div class="rule-text"><strong>Зарабатывай своё место.</strong> Каждый член вносит вклад. Балласта в семье Бланч нет.</div></div>
+      <div class="rule-item"><div class="rule-num">08</div><div class="rule-text"><strong>Имя священно.</strong> Ты представляешь Бланч везде, где бы ни находился. Веди себя соответственно — всегда.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── RECRUITMENT ── -->
+<section id="recruitment">
+  <div class="inner">
+    <p class="section-label reveal">Присоединиться</p>
+    <div class="rule-line reveal" style="margin:0 auto 30px"></div>
+    <h2 class="section-title reveal">Стать <span>Семьёй</span></h2>
+    <p class="section-body reveal" style="max-width:100%;margin:0 auto 52px">
+      Семья Бланч не даёт объявлений. Мы наблюдаем. Если ты нашёл эту страницу —
+      кто-то уже указал на тебя. Это значит, за тобой следят.
+      Вопрос в том — стоишь ли ты нашего времени?
+    </p>
+
+    <div class="req-grid">
+      <div class="req-card reveal" style="transition-delay:0.1s">
+        <span class="req-icon">🎙️</span>
+        <div class="req-title">Активный РП</div>
+        <div class="req-body">Ты должен быть активным, преданным ролевиком. Мы ожидаем присутствия, постоянства и глубины персонажа. Угасающих — отчисляем.</div>
+      </div>
+      <div class="req-card reveal" style="transition-delay:0.2s">
+        <span class="req-icon">🤐</span>
+        <div class="req-title">Дискретность</div>
+        <div class="req-body">Никакой OOC-драмы. Никаких утечек. Никакого мета. Что происходит в семье — остаётся в персонаже. Нулевая терпимость.</div>
+      </div>
+      <div class="req-card reveal" style="transition-delay:0.3s">
+        <span class="req-icon">🎯</span>
+        <div class="req-title">Доказанные намерения</div>
+        <div class="req-body">Тебя должен представить действующий член или ты должен заявить о себе в городе. Холодные заявки без контекста игнорируются.</div>
+      </div>
+    </div>
+
+    <a href="#" class="btn btn-primary reveal">Связаться с членом семьи в городе</a>
+
+    <!-- APPLICATION FORM -->
+    <div class="app-form-wrap reveal">
+      <div class="app-form-header">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm4 18H6V4h7v5h5v11z"/></svg>
+        <div>
+          <div class="app-form-title">Заявка на вступление / Application</div>
+          <div class="app-form-subtitle">Заполни форму — мы рассмотрим в течение 24 часов</div>
+        </div>
+      </div>
+
+      <form class="app-form" id="appForm" autocomplete="off">
+
+        <div class="form-row">
+          <div class="form-field">
+            <label class="form-label">IC Name <span class="req">*</span></label>
+            <input class="form-input" type="text" name="ic_name" placeholder="e.g. Tony Blanch" required pattern="[A-Za-z\s\-']+" title="Latin characters only"/>
+          </div>
+          <div class="form-field">
+            <label class="form-label">OOC Age <span class="req">*</span></label>
+            <input class="form-input" type="number" name="ooc_age" placeholder="18" min="16" max="60" required/>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-field">
+            <label class="form-label">Hours per day <span class="req">*</span></label>
+            <select class="form-select" name="hours" required>
+              <option value="" disabled selected>Select...</option>
+              <option value="1-2">1 – 2 часа</option>
+              <option value="3-4">3 – 4 часа</option>
+              <option value="5-6">5 – 6 часов</option>
+              <option value="7+">7+ часов</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label class="form-label">Timezone <span class="req">*</span></label>
+            <select class="form-select" name="timezone" required>
+              <option value="" disabled selected>Select...</option>
+              <option>UTC+3 (MSK)</option>
+              <option>UTC+2</option>
+              <option>UTC+4</option>
+              <option>UTC+5</option>
+              <option>UTC+6</option>
+              <option>UTC+0</option>
+              <option>Другой</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-divider"></div>
+
+        <div class="form-row full">
+          <div class="form-field">
+            <label class="form-label">Previous families <span class="req">*</span></label>
+            <input class="form-input" type="text" name="prev_families" placeholder="e.g. Moretti, Независимый — если не было, напиши None"/>
+          </div>
+        </div>
+
+        <div class="form-row full">
+          <div class="form-field">
+            <label class="form-label">Why BLANCH? <span class="req">*</span></label>
+            <textarea class="form-textarea" name="why" placeholder="Расскажи почему хочешь именно в семью Бланч..." required minlength="60"></textarea>
+          </div>
+        </div>
+
+        <div class="form-row full">
+          <div class="form-field">
+            <label class="form-label">High-rank experience</label>
+            <textarea class="form-textarea" name="exp" placeholder="Capo, Underboss и т.д. — если не было, напиши None" style="min-height:80px"></textarea>
+          </div>
+        </div>
+
+        <div class="form-footer">
+          <span class="form-note">* — обязательные поля · IC имя только латиницей</span>
+          <button type="submit" class="btn-submit">
+            <span>Отправить заявку</span>
+            <svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2z"/></svg>
           </button>
-          <div class="user-dropdown" id="userDropdown" hidden>
-            <button type="button" id="settingsButton">Настройки</button>
-            <button type="button" id="logoutButton">Выйти</button>
-          </div>
         </div>
-      </div>
-    </header>
+      </form>
 
-    <main id="top" class="app-shell" hidden>
-      <section class="hero" aria-labelledby="hero-title">
-        <div class="hero-bg" aria-hidden="true">
-          <span class="blade blade-one"></span>
-          <span class="blade blade-two"></span>
-          <span class="blade blade-three"></span>
-        </div>
+      <div class="form-success" id="formSuccess">
+        <div class="success-scan"></div>
 
-        <div class="hero-inner">
-          <p class="eyebrow">GTA 5 RP FAMILY</p>
-          <h1 id="hero-title" class="chrome-title" data-text="BLANCH">BLANCH</h1>
-          <p class="hero-copy">
-            Официальный хаб семьи: роли, правила сервера и заявка в состав.
-            Черный фон, холодный хром и стиль, который сразу считывается.
-          </p>
-
-          <div class="hero-actions">
-            <a class="button button-primary magnetic" href="#join">Подать заявку</a>
-            <a class="button button-ghost magnetic" href="#photos">Смотреть фото</a>
+        <div class="success-rings">
+          <div class="success-emblem">
+            <svg viewBox="0 0 24 24"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg>
           </div>
         </div>
 
-      </section>
+        <p class="success-status">Заявка получена</p>
 
-      <section class="section family-section" id="family" aria-labelledby="family-title">
-        <div class="section-heading">
-          <p class="eyebrow">About Family</p>
-          <h2 id="family-title">О семье BLANCH</h2>
-        </div>
-        <div class="family-grid">
-          <article class="feature-card reveal">
-            <span class="card-index">01</span>
-            <h3>Фамилия</h3>
-            <p>BLANCH носят только участники семьи. Фамилия должна выглядеть достойно в игре, чате и Discord.</p>
-          </article>
-          <article class="feature-card reveal">
-            <span class="card-index">02</span>
-            <h3>Состав</h3>
-            <p>Внутри семьи есть старший состав, основной состав и новички. Каждый ранг отвечает за свои задачи.</p>
-          </article>
-          <article class="feature-card reveal">
-            <span class="card-index">03</span>
-            <h3>Поведение</h3>
-            <p>Без лишних конфликтов, рекламы и слива информации. Уважение к семье важнее случайного хайпа.</p>
-          </article>
-        </div>
-      </section>
+        <div class="success-title">Ваша анкета подана.<br/>Ожидайте — мы свяжемся с вами.</div>
 
-      <section class="section photos-section" id="photos" aria-labelledby="photos-title">
-        <div class="section-heading">
-          <p class="eyebrow">Gallery</p>
-          <h2 id="photos-title">Фото BLANCH</h2>
+        <div class="success-divider">
+          <span></span>
+          <svg viewBox="0 0 24 24"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg>
+          <span></span>
         </div>
 
-        <div class="photo-grid" aria-label="Галерея BLANCH">
-          <button class="photo-card reveal" type="button" data-index="0" data-src="coming-soon.gif?v=3" data-title="В скором времени"><span>01</span><img src="coming-soon.gif?v=3" alt="В скором времени" /><strong>В скором времени</strong></button>
-          <button class="photo-card reveal" type="button" data-index="1" data-src="coming-soon.gif?v=3" data-title="В скором времени"><span>02</span><img src="coming-soon.gif?v=3" alt="В скором времени" /><strong>В скором времени</strong></button>
-          <button class="photo-card reveal" type="button" data-index="2" data-src="coming-soon.gif?v=3" data-title="В скором времени"><span>03</span><img src="coming-soon.gif?v=3" alt="В скором времени" /><strong>В скором времени</strong></button>
-          <button class="photo-card reveal" type="button" data-index="3" data-src="coming-soon.gif?v=3" data-title="В скором времени"><span>04</span><img src="coming-soon.gif?v=3" alt="В скором времени" /><strong>В скором времени</strong></button>
-          <button class="photo-card reveal" type="button" data-index="4" data-src="coming-soon.gif?v=3" data-title="В скором времени"><span>05</span><img src="coming-soon.gif?v=3" alt="В скором времени" /><strong>В скором времени</strong></button>
-          <button class="photo-card reveal" type="button" data-index="5" data-src="coming-soon.gif?v=3" data-title="В скором времени"><span>06</span><img src="coming-soon.gif?v=3" alt="В скором времени" /><strong>В скором времени</strong></button>
-          <button class="photo-card reveal" type="button" data-index="6" data-src="coming-soon.gif?v=3" data-title="В скором времени"><span>07</span><img src="coming-soon.gif?v=3" alt="В скором времени" /><strong>В скором времени</strong></button>
-          <button class="photo-card reveal" type="button" data-index="7" data-src="coming-soon.gif?v=3" data-title="В скором времени"><span>08</span><img src="coming-soon.gif?v=3" alt="В скором времени" /><strong>В скором времени</strong></button>
-        </div>
-      </section>
+        <p class="success-body">
+          Семья Бланч рассмотрит твою заявку в течение <strong>24 часов</strong>.<br/>
+          С тобой свяжутся через Discord — держи уведомления включёнными.<br/>
+          Повторная заявка будет доступна через <strong>1 час</strong>.
+        </p>
 
-      <section class="section rules-section" id="rules" aria-labelledby="rules-title">
-        <div class="section-heading">
-          <p class="eyebrow">Server Rules</p>
-          <h2 id="rules-title">Правила сервера</h2>
-        </div>
-        <div class="rule-list">
-          <div class="rule-line reveal"><strong>1</strong><p>У каждого пользователя должен стоять ник, как на сервере. 🤝</p></div>
-          <div class="rule-line reveal"><strong>2</strong><p>Запрещается ставить фамилию <b>Blanch</b>, если вы не являетесь членом семьи. 🤝</p></div>
-          <div class="rule-line reveal"><strong>3</strong><p>Запрещается реклама чего-либо без согласования с <span class="inline-role ceo">@CEO</span> и <span class="inline-role attorney">@Attorney</span>. 🤝</p></div>
-          <div class="rule-line reveal"><strong>4</strong><p>Запрещается разглашение чьей-либо персональной информации. 🤝</p></div>
-          <div class="rule-line reveal"><strong>5</strong><p>Запрещается оскорбление старшего состава семьи. 🤝</p></div>
-          <div class="rule-line reveal"><strong>6</strong><p>Запрещается любой сексуальный контент в чатах. 🤝</p></div>
-        </div>
-      </section>
-
-      <section class="join-section" id="join" aria-labelledby="join-title">
-        <div class="join-copy">
-          <p class="eyebrow">Recruitment</p>
-          <h2 id="join-title">Заявка в семью BLANCH</h2>
-          <p>
-            Для вступления важны стабильный онлайн, адекватность, голосовая связь и умение играть в стиле семьи.
-          </p>
-          <p class="auth-cooldown" id="cooldownText"></p>
-        </div>
-        <form class="join-form reveal" id="joinForm">
-          <label>
-            Имя Фамилия IC | Возраст OOC <span>*</span>
-            <input name="identity" type="text" required placeholder="Например: Ivan_Blanch | 16" />
-          </label>
-          <label>
-            Ваш онлайн в день | Часовой пояс <span>*</span>
-            <input name="online" type="text" required placeholder="Например: 5-7 часов | МСК" />
-          </label>
-          <label>
-            В каких семьях были? <span>*</span>
-            <input name="families" type="text" required placeholder="Укажите семьи или напишите: не был" />
-          </label>
-          <label>
-            Почему решили вступить в BLANCH? <span>*</span>
-            <textarea name="reason" required placeholder="Расскажите коротко, почему выбрали нашу семью"></textarea>
-          </label>
-          <label>
-            Ваш опыт на высоких должностях? <span>*</span>
-            <textarea name="experience" required placeholder="Опишите опыт управления, старшего состава, кураторства или лидерства"></textarea>
-          </label>
-          <p class="form-status" id="formStatus" aria-live="polite"></p>
-          <div class="form-actions">
-            <button class="button button-cancel magnetic" type="reset">Отмена</button>
-            <button class="button button-primary magnetic" type="submit">Отправить</button>
-          </div>
-        </form>
-      </section>
-    </main>
-
-    <section class="settings-screen app-shell" id="settingsScreen" hidden>
-      <div class="section-heading">
-        <p class="eyebrow">Settings</p>
-        <h2>Темы сайта</h2>
-      </div>
-      <div class="theme-grid" aria-label="Выбор темы">
-        <button class="theme-card" type="button" data-theme="chrome">
-          <span class="theme-preview chrome-preview"></span>
-          <strong>Chrome</strong>
-          <small>Черный, хром, красный акцент</small>
-        </button>
-        <button class="theme-card" type="button" data-theme="blood">
-          <span class="theme-preview blood-preview"></span>
-          <strong>Blood</strong>
-          <small>Больше красного свечения</small>
-        </button>
-        <button class="theme-card" type="button" data-theme="ice">
-          <span class="theme-preview ice-preview"></span>
-          <strong>Ice</strong>
-          <small>Холодный бело-синий металл</small>
-        </button>
-        <button class="theme-card" type="button" data-theme="violet">
-          <span class="theme-preview violet-preview"></span>
-          <strong>Violet</strong>
-          <small>Темный фиолетовый неон</small>
-        </button>
-      </div>
-    </section>
-
-    <footer class="site-footer app-shell" hidden>
-      <span>BLANCH FAMILY</span>
-      <span>GTA 5 RP</span>
-      <span>Chrome / Black / Ice</span>
-    </footer>
-
-    <div class="photo-modal" id="photoModal" hidden>
-      <div class="photo-modal-backdrop" data-close-photo></div>
-      <div class="photo-viewer" role="dialog" aria-modal="true" aria-label="Просмотр фото">
-        <button class="photo-close" type="button" data-close-photo>×</button>
-        <button class="photo-arrow photo-prev" type="button" id="photoPrev" aria-label="Предыдущее фото">‹</button>
-        <img id="photoViewerImage" alt="" />
-        <button class="photo-arrow photo-next" type="button" id="photoNext" aria-label="Следующее фото">›</button>
-        <div class="photo-caption">
-          <strong id="photoViewerTitle">BLANCH</strong>
-          <span id="photoViewerCount">1 / 8</span>
+        <div class="success-tags">
+          <span class="success-tag">На рассмотрении</span>
+          <span class="success-tag">До 24 часов</span>
+          <span class="success-tag">Ответ в Discord</span>
         </div>
       </div>
     </div>
 
-    <script src="script.js"></script>
-  </body>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="footer-brand">Семья Бланч</div>
+  <div class="footer-copy">Лос-Сантос · Сан-Андреас · GTA V Roleplay · Осн. 2025</div>
+  <div class="footer-copy">Только IC — В целях развлечения</div>
+</footer>
+
+<script>
+/* ══════════════════════════════════════════════════════
+   DISCORD CONFIG
+   1. Создай приложение на https://discord.com/developers
+   2. В OAuth2 → Redirects добавь точный URL этой страницы
+   3. Вставь свой Client ID ниже
+══════════════════════════════════════════════════════ */
+const DISCORD_CLIENT_ID = '1504600409971363860';
+const API_BASE = 'https://blanch-worker-k8m4x2q9.rodionpytra.workers.dev';
+const REDIRECT_URI = API_BASE + '/auth/discord/callback';
+
+function savedSession() { return localStorage.getItem('blanch-session') || ''; }
+function apiFetch(path, options = {}) {
+  const headers = new Headers(options.headers || {});
+  const session = savedSession();
+  if (session) headers.set('Authorization', 'Bearer ' + session);
+  return fetch(API_BASE + path, { credentials: 'include', ...options, headers });
+}
+
+/* ══════════════════════════════════════════════════════
+   ВАЙТЛИСТ — добавляй Discord ID разрешённых пользователей
+   Узнать свой ID: Discord → Настройки → Расширенные → Режим разработчика
+   затем ПКМ на себе → Копировать ID
+══════════════════════════════════════════════════════ */
+const ALLOWED_IDS = new Set([
+  // '123456789012345678',  // Пример: Tony Blanch (Boss)
+  // '987654321098765432',  // Пример: Marco Blanch (Underboss)
+  // Добавляй Discord ID участников сюда ↓
+]);
+
+/* ══════════════════════════════════════════════════════
+   DISCORD AUTH
+══════════════════════════════════════════════════════ */
+const overlay      = document.getElementById('login-overlay');
+const stateLogin   = document.getElementById('state-login');
+const stateCheck   = document.getElementById('state-checking');
+const stateDenied  = document.getElementById('state-denied');
+const loginBtn     = document.getElementById('login-btn');
+const btnLogout    = document.getElementById('btn-logout');
+
+function showState(name) {
+  stateLogin .style.display = name === 'login'    ? '' : 'none';
+  stateCheck .classList.toggle('show', name === 'checking');
+  stateDenied.classList.toggle('show', name === 'denied');
+}
+
+function parseHash() {
+  const h = location.hash.slice(1);
+  if (!h) return {};
+  return Object.fromEntries(h.split('&').map(p => p.split('=')));
+}
+
+async function fetchDiscordUser(token) {
+  try {
+    const r = await fetch('https://discord.com/api/users/@me', {
+      headers: { Authorization: 'Bearer ' + token }
+    });
+    return r.ok ? r.json() : null;
+  } catch { return null; }
+}
+
+function avatarUrl(user) {
+  return user.avatar
+    ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=128`
+    : `https://cdn.discordapp.com/embed/avatars/${(user.discriminator || 0) % 5}.png`;
+}
+
+function grantAccess(user) {
+  /* аватар + ник в навбаре */
+  const nav = document.querySelector('nav');
+  const el  = document.createElement('div');
+  el.className = 'nav-user';
+  el.innerHTML = `<img class="nav-avatar" src="${avatarUrl(user)}" alt=""/><span class="nav-username">${user.global_name || user.username}</span>`;
+  nav.appendChild(el);
+  /* плавно скрываем оверлей */
+  overlay.classList.add('out');
+}
+
+function denyAccess(user) {
+  document.getElementById('denied-avatar').src = avatarUrl(user);
+  document.getElementById('denied-user').textContent = user.global_name || user.username;
+  showState('denied');
+}
+
+function logout() {
+  localStorage.removeItem('dc_token');
+  localStorage.removeItem('dc_user');
+  localStorage.removeItem('blanch-session');
+  apiFetch('/auth/logout', { method: 'POST' }).catch(() => {});
+  showState('login');
+}
+
+async function checkAccess(token) {
+  showState('checking');
+
+  const user = await fetchDiscordUser(token);
+
+  if (!user) {
+    /* токен протух — сбрасываем */
+    localStorage.removeItem('dc_token');
+    localStorage.removeItem('dc_user');
+    showState('login');
+    return;
+  }
+
+  localStorage.setItem('dc_user', JSON.stringify(user));
+
+  /* если вайтлист пустой — демо-режим, пускаем всех */
+  if (ALLOWED_IDS.size === 0 || DISCORD_CLIENT_ID === 'ВАШ_CLIENT_ID') {
+    grantAccess(user);
+    return;
+  }
+
+  if (ALLOWED_IDS.has(user.id)) {
+    grantAccess(user);
+  } else {
+    denyAccess(user);
+  }
+}
+
+async function init() {
+  const hashParams = new URLSearchParams(location.hash.slice(1));
+  const session = hashParams.get('session');
+  if (session) {
+    localStorage.setItem('blanch-session', session);
+    history.replaceState(null, '', location.pathname + '?login=ok');
+  }
+
+  const storedSession = savedSession();
+  if (storedSession) {
+    showState('checking');
+    try {
+      const response = await apiFetch('/api/me');
+      const result = await response.json();
+      if (result.user) {
+        localStorage.setItem('dc_user', JSON.stringify(result.user));
+        grantAccess(result.user);
+        return;
+      }
+    } catch {}
+    localStorage.removeItem('blanch-session');
+  }
+
+  showState('login');
+
+  loginBtn.addEventListener('click', () => {
+    loginBtn.classList.add('loading');
+    location.href = API_BASE + '/auth/discord';
+  });
+}
+
+btnLogout?.addEventListener('click', logout);
+
+init();
+
+/* ══════════════════════════════════════════════════════
+   THREE.JS — ОПТИМИЗИРОВАННЫЕ ЧАСТИЦЫ
+   • убраны O(n²) линии-созвездия — главная причина лагов
+   • частиц 700 вместо 1800
+   • pixelRatio ограничен до 1.5
+══════════════════════════════════════════════════════ */
+(function(){
+  const canvas   = document.getElementById('bg-canvas');
+  const renderer = new THREE.WebGLRenderer({canvas, alpha:true, antialias:false});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+  renderer.setSize(window.innerWidth, window.innerHeight);
+
+  const scene  = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 1000);
+  camera.position.z = 5;
+
+  const COUNT = 700;
+  const pos   = new Float32Array(COUNT * 3);
+  for (let i = 0; i < COUNT; i++) {
+    pos[i*3]   = (Math.random() - 0.5) * 22;
+    pos[i*3+1] = (Math.random() - 0.5) * 22;
+    pos[i*3+2] = (Math.random() - 0.5) * 10;
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+
+  const mat = new THREE.PointsMaterial({
+    color: 0x777777, size: 0.018,
+    transparent: true, opacity: 0.3, sizeAttenuation: true
+  });
+  scene.add(new THREE.Points(geo, mat));
+
+  let mx = 0, my = 0;
+  let camX = 0, camY = 0;
+  let t = 0;
+
+  /* Three.js крутится в своём RAF — не конкурирует с главным */
+  (function tick(){
+    requestAnimationFrame(tick);
+    t += 0.0003;
+    scene.rotation.y = t + mx * 0.25;
+    scene.rotation.x = my * 0.15;
+    camX += (mx * 0.4 - camX) * 0.03;
+    camY += (-my * 0.4 - camY) * 0.03;
+    camera.position.x = camX;
+    camera.position.y = camY;
+    renderer.render(scene, camera);
+  })();
+
+  window.addEventListener('mousemove', e => {
+    mx = (e.clientX / window.innerWidth  - 0.5) * 0.6;
+    my = (e.clientY / window.innerHeight - 0.5) * 0.6;
+  });
+
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+})();
+
+/* ══════════════════════════════════════════════════════
+   ГЛАВНЫЙ RAF-ЦИКЛ: курсор + вращение логотипа
+   Один requestAnimationFrame на всё — никаких гонок
+══════════════════════════════════════════════════════ */
+const curEl  = document.getElementById('cursor');
+const ringEl = document.getElementById('cursor-ring');
+const logoWrap = document.getElementById('hero3d');
+
+/* состояние курсора */
+let mCx = 0, mCy = 0;   // сырая позиция мыши
+let rCx = 0, rCy = 0;   // плавная позиция кольца
+
+/* состояние логотипа */
+const MAX_Y = 26, MAX_X = 12;
+let lTargetY = 0, lTargetX = 0;
+let lCurY    = 0, lCurX    = 0;
+let lInside  = false;
+
+window.addEventListener('mousemove', e => {
+  mCx = e.clientX;
+  mCy = e.clientY;
+
+  if (lInside) {
+    const rect = document.getElementById('hero').getBoundingClientRect();
+    const nx = (e.clientX - rect.left) / rect.width  * 2 - 1;
+    const ny = (e.clientY - rect.top)  / rect.height * 2 - 1;
+    lTargetY =  nx * MAX_Y;
+    lTargetX = -ny * MAX_X;
+  }
+}, {passive: true});
+
+document.getElementById('hero').addEventListener('mouseenter', () => { lInside = true;  });
+document.getElementById('hero').addEventListener('mouseleave', () => {
+  lInside  = false;
+  lTargetY = 0;
+  lTargetX = 0;
+});
+
+/* единый цикл — 60fps без конкурентов */
+function mainLoop() {
+  requestAnimationFrame(mainLoop);
+
+  /* курсор — точка */
+  curEl.style.left = mCx + 'px';
+  curEl.style.top  = mCy + 'px';
+
+  /* курсор — кольцо (lag) */
+  rCx += (mCx - rCx) * 0.1;
+  rCy += (mCy - rCy) * 0.1;
+  ringEl.style.left = rCx + 'px';
+  ringEl.style.top  = rCy + 'px';
+
+  /* логотип — плавное вращение */
+  lCurY += (lTargetY - lCurY) * 0.055;
+  lCurX += (lTargetX - lCurX) * 0.055;
+  logoWrap.style.transform =
+    `perspective(1000px) rotateY(${lCurY.toFixed(3)}deg) rotateX(${lCurX.toFixed(3)}deg)`;
+}
+mainLoop();
+
+/* курсор — hover-подсветка */
+document.querySelectorAll('a,.btn,.stat-card,.req-card,.member-card,.zone-item,.rule-item,.btn-discord').forEach(el => {
+  el.addEventListener('mouseenter', () => {
+    ringEl.style.transform    = 'translate(-50%,-50%) scale(1.8)';
+    ringEl.style.borderColor  = 'rgba(201,162,39,0.5)';
+  });
+  el.addEventListener('mouseleave', () => {
+    ringEl.style.transform    = 'translate(-50%,-50%) scale(1)';
+    ringEl.style.borderColor  = 'rgba(255,255,255,0.3)';
+  });
+});
+
+/* ══════════════════════════════════════════════════════
+   SCROLL REVEAL
+══════════════════════════════════════════════════════ */
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+document.querySelectorAll('.reveal,.reveal-left,.reveal-right').forEach(el => obs.observe(el));
+
+/* ══════════════════════════════════════════════════════
+   3D TILT — КАРТА (CSS-transition, отдельный обработчик)
+══════════════════════════════════════════════════════ */
+const mapEl = document.getElementById('map3d');
+if (mapEl) {
+  const parent = mapEl.parentElement;
+  parent.addEventListener('mouseenter', () => { mapEl.style.transition = 'none'; });
+  parent.addEventListener('mousemove', e => {
+    const r  = mapEl.getBoundingClientRect();
+    const rx = -(e.clientY - r.top  - r.height/2) / 22;
+    const ry =  (e.clientX - r.left - r.width/2)  / 22;
+    mapEl.style.transform = `perspective(800px) rotateX(${rx}deg) rotateY(${ry}deg)`;
+  });
+  parent.addEventListener('mouseleave', () => {
+    mapEl.style.transition = 'transform 0.8s cubic-bezier(0.16,1,0.3,1)';
+    mapEl.style.transform  = 'perspective(800px) rotateX(0) rotateY(0)';
+  });
+}
+
+/* ══════════════════════════════════════════════════════
+   3D TILT — КАРТОЧКИ (CSS-transition)
+══════════════════════════════════════════════════════ */
+document.querySelectorAll('.stat-card,.req-card').forEach(card => {
+  card.addEventListener('mouseenter', () => { card.style.transition = 'none'; });
+  card.addEventListener('mousemove', e => {
+    const r  = card.getBoundingClientRect();
+    const rx = -(e.clientY - r.top  - r.height/2) / 14;
+    const ry =  (e.clientX - r.left - r.width/2)  / 14;
+    card.style.transform = `perspective(600px) rotateX(${rx}deg) rotateY(${ry}deg) translateY(-8px)`;
+  });
+  card.addEventListener('mouseleave', () => {
+    card.style.transition = 'transform 0.7s cubic-bezier(0.16,1,0.3,1)';
+    card.style.transform  = 'perspective(600px) rotateX(0) rotateY(0) translateY(0)';
+  });
+});
+
+/* ══════════════════════════════════════════════════════
+   APPLICATION FORM + COOLDOWN (1 час)
+══════════════════════════════════════════════════════ */
+(function(){
+  const form    = document.getElementById('appForm');
+  const success = document.getElementById('formSuccess');
+  if (!form) return;
+
+  const COOLDOWN_MS = 30 * 60 * 1000; // 30 минут
+
+  /* вставляем блок кулдауна перед кнопкой */
+  const footer = form.querySelector('.form-footer');
+  const cdDiv  = document.createElement('div');
+  cdDiv.className = 'cooldown-msg';
+  cdDiv.innerHTML = 'Ты уже отправил заявку. Следующая возможна через <span class="cooldown-time" id="cd-time"></span>.';
+  form.insertBefore(cdDiv, footer);
+
+  function formatTime(ms) {
+    const m = Math.floor(ms / 60000);
+    const s = Math.floor((ms % 60000) / 1000);
+    return `${m}м ${s}с`;
+  }
+
+  function checkCooldown() {
+    const last = parseInt(localStorage.getItem('last_app_submit') || '0');
+    const elapsed = Date.now() - last;
+    if (elapsed < COOLDOWN_MS) {
+      const remaining = COOLDOWN_MS - elapsed;
+      cdDiv.classList.add('show');
+      footer.style.opacity = '0.3';
+      footer.style.pointerEvents = 'none';
+      document.getElementById('cd-time').textContent = formatTime(remaining);
+      const t = setInterval(() => {
+        const r = COOLDOWN_MS - (Date.now() - last);
+        if (r <= 0) {
+          clearInterval(t);
+          cdDiv.classList.remove('show');
+          footer.style.opacity = '';
+          footer.style.pointerEvents = '';
+        } else {
+          document.getElementById('cd-time').textContent = formatTime(r);
+        }
+      }, 1000);
+      return true;
+    }
+    return false;
+  }
+
+  checkCooldown();
+
+  /* подсветка инпутов при фокусе */
+  form.querySelectorAll('.form-input,.form-textarea,.form-select').forEach(el => {
+    el.addEventListener('focus', () => {
+      el.closest('.form-field').querySelector('.form-label').style.color = '#666';
+    });
+    el.addEventListener('blur', () => {
+      el.closest('.form-field').querySelector('.form-label').style.color = '';
+    });
+  });
+
+  /* IC name — только латиница */
+  const icInput = form.querySelector('[name="ic_name"]');
+  if (icInput) {
+    icInput.addEventListener('input', () => {
+      icInput.value = icInput.value.replace(/[^A-Za-z\s'\-]/g, '');
+    });
+  }
+
+  /* отправка */
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    if (checkCooldown()) return;
+
+    const btn = form.querySelector('.btn-submit');
+    const btnText = btn.querySelector('span');
+    const originalText = btnText.textContent;
+    btn.style.opacity = '0.5';
+    btn.style.pointerEvents = 'none';
+    btnText.textContent = 'Отправляем...';
+
+    const values = Object.fromEntries(new FormData(form).entries());
+    const payload = {
+      identity: `${values.ic_name || ""} | ${values.ooc_age || ""}`,
+      online: `${values.hours || ""} | ${values.timezone || ""}`,
+      families: values.prev_families || 'None',
+      reason: values.why || '',
+      experience: values.exp || 'None',
+    };
+
+    try {
+      const response = await apiFetch('/api/apply', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const result = await response.json();
+      if (!response.ok || !result.ok) throw new Error(result.message || 'Не удалось отправить заявку.');
+
+      if (result.session) localStorage.setItem('blanch-session', result.session);
+      localStorage.setItem('last_app_submit', Date.now().toString());
+      form.style.display = 'none';
+      form.closest('.app-form-wrap').querySelector('.app-form-header').style.display = 'none';
+      success.classList.add('show');
+      success.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } catch (error) {
+      alert(error.message || 'Ошибка отправки заявки.');
+      btn.style.opacity = '';
+      btn.style.pointerEvents = '';
+      btnText.textContent = originalText;
+    }
+  });
+  });
+})();
+
+/* ══════════════════════════════════════════════════════
+   3D ROTATING MODEL — TorusKnot (chrome)
+══════════════════════════════════════════════════════ */
+(function(){
+  const canvas = document.getElementById('model-canvas');
+  if (!canvas) return;
+
+  const W = canvas.parentElement.offsetWidth || 500;
+  const H = 420;
+  canvas.width  = W * Math.min(devicePixelRatio, 2);
+  canvas.height = H * Math.min(devicePixelRatio, 2);
+  canvas.style.width  = W + 'px';
+  canvas.style.height = H + 'px';
+
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.setSize(W, H);
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.2;
+
+  const scene  = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(45, W / H, 0.1, 100);
+  camera.position.set(0, 0, 5.5);
+
+  /* LIGHTS */
+  const ambient = new THREE.AmbientLight(0xffffff, 0.15);
+  scene.add(ambient);
+
+  const light1 = new THREE.PointLight(0xffffff, 3, 20);
+  light1.position.set(4, 4, 4);
+  scene.add(light1);
+
+  const light2 = new THREE.PointLight(0xc9a227, 4, 20); // золотой
+  light2.position.set(-4, -2, 3);
+  scene.add(light2);
+
+  const light3 = new THREE.PointLight(0x8b0000, 2.5, 20); // тёмно-красный
+  light3.position.set(0, -4, -2);
+  scene.add(light3);
+
+  const light4 = new THREE.PointLight(0xaaaaff, 1.5, 20);
+  light4.position.set(-3, 3, -3);
+  scene.add(light4);
+
+  /* MAIN KNOT */
+  const geo = new THREE.TorusKnotGeometry(1.15, 0.38, 256, 32, 2, 3);
+  const mat = new THREE.MeshStandardMaterial({
+    color:     0xd0d0d0,
+    metalness: 1.0,
+    roughness: 0.08,
+    envMapIntensity: 1,
+  });
+  const knot = new THREE.Mesh(geo, mat);
+  scene.add(knot);
+
+  /* WIREFRAME OVERLAY */
+  const wireMat = new THREE.MeshBasicMaterial({
+    color: 0xc9a227,
+    wireframe: true,
+    transparent: true,
+    opacity: 0.04,
+  });
+  scene.add(new THREE.Mesh(geo, wireMat));
+
+  /* OUTER GLOW RING */
+  const ringGeo = new THREE.TorusGeometry(1.85, 0.008, 8, 120);
+  const ringMat = new THREE.MeshBasicMaterial({ color: 0xc9a227, transparent: true, opacity: 0.25 });
+  const ring = new THREE.Mesh(ringGeo, ringMat);
+  ring.rotation.x = Math.PI / 2;
+  scene.add(ring);
+
+  const ring2 = new THREE.Mesh(
+    new THREE.TorusGeometry(2.0, 0.004, 8, 120),
+    new THREE.MeshBasicMaterial({ color: 0x888888, transparent: true, opacity: 0.1 })
+  );
+  ring2.rotation.x = Math.PI / 3;
+  scene.add(ring2);
+
+  /* mouse influence */
+  let tMx = 0, tMy = 0;
+  window.addEventListener('mousemove', e => {
+    tMx = (e.clientX / window.innerWidth  - 0.5) * 0.6;
+    tMy = (e.clientY / window.innerHeight - 0.5) * 0.6;
+  });
+
+  let t = 0, curMx = 0, curMy = 0;
+  (function tick() {
+    requestAnimationFrame(tick);
+    t += 0.006;
+    curMx += (tMx - curMx) * 0.05;
+    curMy += (tMy - curMy) * 0.05;
+
+    knot.rotation.x = t * 0.4  + curMy * 0.5;
+    knot.rotation.y = t * 0.65 + curMx * 0.5;
+    ring.rotation.z  = t * 0.2;
+    ring2.rotation.y = t * 0.3;
+
+    /* lights orbit */
+    light1.position.x = Math.sin(t * 0.7) * 4;
+    light1.position.y = Math.cos(t * 0.5) * 4;
+    light2.position.x = Math.cos(t * 0.6) * 4;
+    light2.position.z = Math.sin(t * 0.4) * 4;
+
+    renderer.render(scene, camera);
+  })();
+
+  window.addEventListener('resize', () => {
+    const nw = canvas.parentElement.offsetWidth || 500;
+    renderer.setSize(nw, H);
+    camera.aspect = nw / H;
+    camera.updateProjectionMatrix();
+  });
+})();
+</script>
+</body>
 </html>
