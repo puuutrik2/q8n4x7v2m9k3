@@ -888,3 +888,261 @@
       .card-title { font-size: 36px; }
       .orb { width: 250px; height: 250px; }
     }
+
+
+/* === BLANCH crew and interactive fixes === */
+html[data-theme="chrome"] {
+  --red: #ff1737;
+  --violet: #b06cff;
+  --muted: #a9a4ad;
+}
+
+html[data-theme="blood"] {
+  --red: #ff0033;
+  --violet: #ff5c7a;
+  --muted: #bfb2b8;
+}
+
+html[data-theme="violet"] {
+  --red: #b06cff;
+  --violet: #f0d8ff;
+  --muted: #c4b8d2;
+}
+
+html[data-theme="blood"] body {
+  background:
+    radial-gradient(circle at 16% 12%, rgba(255,0,51,.32), transparent 30vw),
+    radial-gradient(circle at 82% 24%, rgba(255,255,255,.08), transparent 24vw),
+    linear-gradient(180deg, #050002 0%, #170108 52%, #030002 100%);
+}
+
+html[data-theme="violet"] body {
+  background:
+    radial-gradient(circle at 82% 10%, rgba(176,108,255,.3), transparent 31vw),
+    radial-gradient(circle at 12% 76%, rgba(255,255,255,.08), transparent 28vw),
+    linear-gradient(180deg, #020104 0%, #0b0314 54%, #020104 100%);
+}
+
+html[data-theme="blood"] .discord-btn,
+html[data-theme="blood"] .submit-btn {
+  background: linear-gradient(120deg, #ff123d, #8f001a 48%, #ff6d83 100%);
+  color: #fff;
+}
+
+html[data-theme="violet"] .discord-btn,
+html[data-theme="violet"] .submit-btn {
+  background: linear-gradient(120deg, #f7f2ff, #a985ff 48%, #6c45d8 100%);
+}
+
+.hero-card {
+  --tilt-x: 4deg;
+  --tilt-y: -8deg;
+  --mx: 50%;
+  --my: 50%;
+  --orb-x: 0px;
+  --orb-y: 0px;
+  transform: perspective(1200px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y)) translateY(var(--lift, 0px));
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+  will-change: transform;
+}
+
+.hero-card.is-tilting {
+  animation: none;
+  --lift: -8px;
+  border-color: rgba(255,255,255,.26);
+  box-shadow: 0 42px 130px rgba(0,0,0,.72), 0 0 70px rgba(255,23,55,.16);
+}
+
+.hero-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: .0;
+  background:
+    radial-gradient(circle at var(--mx) var(--my), rgba(255,255,255,.24), transparent 22%),
+    radial-gradient(circle at var(--mx) var(--my), rgba(255,23,55,.2), transparent 42%);
+  transition: opacity .18s ease;
+  mix-blend-mode: screen;
+}
+
+.hero-card.is-tilting::after { opacity: 1; }
+
+.hero-card .orb {
+  transition: transform .18s ease, filter .18s ease;
+  transform: translate(calc(-50% + var(--orb-x)), calc(-50% + var(--orb-y))) translateZ(42px);
+}
+
+.hero-card.is-tilting .orb {
+  filter: saturate(1.35) brightness(1.08);
+}
+
+.hero-card .blade {
+  transition: transform .18s ease, opacity .18s ease;
+  transform: rotate(-10deg) translate3d(calc(var(--orb-x) * .2), calc(var(--orb-y) * .16), 70px);
+}
+
+.hero-card.is-tilting .blade { opacity: .95; }
+
+.card-title,
+.card-kicker {
+  transform: translateZ(80px);
+  transition: transform .18s ease, text-shadow .18s ease;
+}
+
+.hero-card.is-tilting .card-title {
+  transform: translate3d(calc(var(--orb-x) * -.12), calc(var(--orb-y) * -.08), 110px);
+  text-shadow: 0 8px 0 rgba(0,0,0,.6), 0 0 46px rgba(255,255,255,.3), 0 0 34px rgba(255,23,55,.22);
+}
+
+.crew-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  perspective: 1400px;
+}
+
+.crew-card {
+  min-height: 360px;
+  border: 0;
+  background: transparent;
+  perspective: 1100px;
+  outline: none;
+}
+
+.crew-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 360px;
+  transform-style: preserve-3d;
+  transition: transform .72s cubic-bezier(.16, 1, .3, 1);
+}
+
+.crew-card:hover .crew-inner,
+.crew-card:focus-visible .crew-inner {
+  transform: rotateY(180deg) translateY(-8px);
+}
+
+.crew-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: var(--radius);
+  overflow: hidden;
+  padding: 24px;
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.1), transparent 34%),
+    radial-gradient(circle at var(--mx, 50%) var(--my, 40%), rgba(255,23,55,.24), transparent 38%),
+    rgba(10,10,14,.76);
+  box-shadow: 0 22px 70px rgba(0,0,0,.45);
+}
+
+.crew-front::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(115deg, transparent 0 42%, rgba(255,255,255,.18) 48%, transparent 54%),
+    repeating-linear-gradient(180deg, rgba(255,255,255,.03) 0 1px, transparent 1px 4px);
+  opacity: .36;
+}
+
+.crew-back {
+  transform: rotateY(180deg);
+  background:
+    linear-gradient(135deg, rgba(255,23,55,.18), transparent 42%),
+    radial-gradient(circle at 50% 50%, rgba(255,255,255,.11), transparent 34%),
+    rgba(8,8,12,.92);
+}
+
+.crew-rank {
+  position: relative;
+  color: var(--red);
+  font-family: Cinzel, serif;
+  font-weight: 900;
+  letter-spacing: .22em;
+  z-index: 1;
+}
+
+.crew-avatar {
+  position: relative;
+  width: 112px;
+  height: 112px;
+  margin: 48px auto 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: #07070a;
+  font-family: Cinzel, serif;
+  font-size: 34px;
+  font-weight: 900;
+  background: linear-gradient(145deg, #fff, #777 35%, #fff 50%, #969aa5 100%);
+  box-shadow: inset 0 0 32px rgba(0,0,0,.42), 0 0 56px rgba(255,255,255,.18), 0 0 38px rgba(255,23,55,.16);
+  z-index: 1;
+}
+
+.crew-face h3 {
+  position: relative;
+  margin: 0;
+  color: #fff;
+  font-family: Cinzel, serif;
+  font-size: 26px;
+  line-height: 1;
+  z-index: 1;
+}
+
+.crew-front p {
+  position: relative;
+  margin: 14px 0 0;
+  color: var(--muted);
+  font-weight: 900;
+  z-index: 1;
+}
+
+.crew-back span {
+  display: inline-flex;
+  margin-bottom: 34px;
+  color: var(--red);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: .25em;
+  text-transform: uppercase;
+}
+
+.crew-back p {
+  margin: 18px 0 0;
+  color: var(--muted);
+  font-weight: 700;
+  line-height: 1.75;
+}
+
+@media (max-width: 1080px) {
+  .crew-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 620px) {
+  .crew-grid { grid-template-columns: 1fr; }
+}
+/* === end BLANCH crew and interactive fixes === */
+
+
+/* === BLANCH simple login gate === */
+.gate-card-simple {
+  min-height: 420px;
+  gap: 42px;
+  justify-content: center;
+}
+
+.gate-card-simple .gate-logo {
+  margin: 0;
+  font-size: clamp(76px, 14vw, 138px);
+}
+
+.gate-card-simple .gate-login-btn {
+  margin: 0 auto;
+  width: min(360px, 100%);
+  min-height: 58px;
+}
+/* === end BLANCH simple login gate === */

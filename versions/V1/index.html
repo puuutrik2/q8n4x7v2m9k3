@@ -15,15 +15,9 @@
   <div class="noise"></div>
 
   <section class="gate" id="loginGate" aria-label="Вход на сайт">
-    <div class="gate-card">
+    <div class="gate-card gate-card-simple">
       <div class="gate-logo" data-text="BLANCH">BLANCH</div>
-      <div class="gate-star">★</div>
-      <p class="gate-kicker">Лос-Сантос · вступление открыто</p>
-      <p class="gate-copy">Семья BLANCH принимает достойных. Войди через Discord, чтобы открыть сайт и подать заявку.</p>
-      <div class="gate-action">
-        <button class="discord-btn gate-login-btn" id="gateLoginBtn" type="button">Войти через Discord</button>
-      </div>
-      <p class="gate-note">Запрашиваем только профиль Discord</p>
+      <button class="discord-btn gate-login-btn" id="gateLoginBtn" type="button">Войти через Discord</button>
     </div>
   </section>
 
@@ -35,7 +29,7 @@
       </a>
       <nav class="nav" aria-label="Навигация">
         <a href="#family">Семья</a>
-        <a href="#ranks">Иерархия</a>
+        <a href="#crew">Высший состав</a>
         <a href="#gallery">Фото</a>
         <a href="#apply">Вступить</a>
       </nav>
@@ -60,7 +54,7 @@
           <p class="tagline">Холодный стиль, чистая дисциплина и состав, который держит слово. Заявка идет через Discord, без лишнего шума и спама.</p>
           <div class="hero-actions">
             <a class="discord-btn" href="#apply">Подать заявку</a>
-            <a class="ghost-btn" href="#ranks">Смотреть иерархию</a>
+            <a class="ghost-btn" href="#crew">Высший состав</a>
           </div>
         </div>
 
@@ -99,21 +93,75 @@
         </div>
       </section>
 
-      <section id="ranks">
+            <section id="crew">
         <div class="section-head reveal">
           <div>
-            <div class="section-label">Hierarchy</div>
-            <h2>Иерархия BLANCH</h2>
+            <div class="section-label">High Council</div>
+            <h2>Высший состав</h2>
           </div>
-          <p class="section-copy">Не таблица ради таблицы, а нормальная лестница состава: сверху руководство, ниже опора семьи и новые люди.</p>
+          <p class="section-copy">Наведи на карточку: она разворачивается и показывает, за что отвечает человек в семье BLANCH.</p>
         </div>
-        <div class="rank-wrap">
-          <div class="rank-row reveal"><strong>Tier 01</strong><b>@CEO</b><span>Глава семьи. Финальное слово и критически важные вопросы.</span></div>
-          <div class="rank-row reveal"><strong>Tier 02</strong><b>@Attorney</b><span>Замы. Решают движ, заявки, порядок и спорные моменты.</span></div>
-          <div class="rank-row reveal"><strong>Tier 03</strong><b>@Seasoned</b><span>Руководители направлений. Держат отделы и активность.</span></div>
-          <div class="rank-row reveal"><strong>Tier 04</strong><b>@Principal / @Chief</b><span>Кураторы и следящие. Контроль состава, правил и дисциплины.</span></div>
-          <div class="rank-row reveal"><strong>Tier 05</strong><b>@Senior Blanch</b><span>Старший состав, проверенные люди, опора фамки.</span></div>
-          <div class="rank-row reveal"><strong>Tier 06</strong><b>@Blanch / @Little Blanch</b><span>Основной состав и новички, которые только входят в стиль семьи.</span></div>
+        <div class="crew-grid">
+          <article class="crew-card reveal" tabindex="0">
+            <div class="crew-inner">
+              <div class="crew-face crew-front">
+                <div class="crew-rank">01</div>
+                <div class="crew-avatar">CEO</div>
+                <h3>Глава семьи</h3>
+                <p>@CEO</p>
+              </div>
+              <div class="crew-face crew-back">
+                <span>Главный</span>
+                <h3>Финальное слово</h3>
+                <p>Критически важные вопросы, общий курс семьи, решения по составу и крупному движу.</p>
+              </div>
+            </div>
+          </article>
+          <article class="crew-card reveal" tabindex="0">
+            <div class="crew-inner">
+              <div class="crew-face crew-front">
+                <div class="crew-rank">02</div>
+                <div class="crew-avatar">AT</div>
+                <h3>Заместитель</h3>
+                <p>@Attorney</p>
+              </div>
+              <div class="crew-face crew-back">
+                <span>Замы</span>
+                <h3>Решают движ</h3>
+                <p>Заявки, спорные ситуации, порядок в семье и контроль того, чтобы состав не проседал.</p>
+              </div>
+            </div>
+          </article>
+          <article class="crew-card reveal" tabindex="0">
+            <div class="crew-inner">
+              <div class="crew-face crew-front">
+                <div class="crew-rank">03</div>
+                <div class="crew-avatar">SN</div>
+                <h3>Руководитель</h3>
+                <p>@Seasoned</p>
+              </div>
+              <div class="crew-face crew-back">
+                <span>Направления</span>
+                <h3>Держит отдел</h3>
+                <p>Отвечает за активность, дисциплину направления и людей, которые двигают семью вперед.</p>
+              </div>
+            </div>
+          </article>
+          <article class="crew-card reveal" tabindex="0">
+            <div class="crew-inner">
+              <div class="crew-face crew-front">
+                <div class="crew-rank">04</div>
+                <div class="crew-avatar">CH</div>
+                <h3>Куратор</h3>
+                <p>@Chief</p>
+              </div>
+              <div class="crew-face crew-back">
+                <span>Контроль</span>
+                <h3>Следит за порядком</h3>
+                <p>Смотрит за составом, отделами, правилами и тем, чтобы фамка выглядела как BLANCH.</p>
+              </div>
+            </div>
+          </article>
         </div>
       </section>
 

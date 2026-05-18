@@ -88,13 +88,6 @@ const API_BASE = 'https://blanch-worker-k8m4x2q9.rodionpytra.workers.dev';
       setUser(null);
     });
 
-    document.querySelector('[data-theme-btn]').addEventListener('click', () => {
-      themeIndex = (themeIndex + 1) % themes.length;
-      localStorage.setItem(THEME_KEY, themes[themeIndex]);
-      document.documentElement.dataset.theme = themes[themeIndex];
-      profileMenu.classList.remove('open');
-    });
-
     function showToast(text) {
       toast.textContent = text;
       toast.classList.add('show');
@@ -246,5 +239,76 @@ const API_BASE = 'https://blanch-worker-k8m4x2q9.rodionpytra.workers.dev';
         renderer.setSize(window.innerWidth, window.innerHeight);
       });
     })();
+
+/* === BLANCH interactive card/theme fixes === */
+(function setupThemeButton() {
+  const themeBtn = document.querySelector('[data-theme-btn]');
+  if (!themeBtn) return;
+
+  function paintThemeButton() {
+    const active = document.documentElement.dataset.theme || themes[0];
+    const labels = { chrome: 'Тема: Chrome', blood: 'Тема: Blood', violet: 'Тема: Violet' };
+    themeBtn.textContent = labels[active] || 'Сменить тему';
+  }
+
+  paintThemeButton();
+  themeBtn.addEventListener('click', (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    themeIndex = (themeIndex + 1) % themes.length;
+    const next = themes[themeIndex];
+    localStorage.setItem(THEME_KEY, next);
+    document.documentElement.dataset.theme = next;
+    paintThemeButton();
+    profileMenu.classList.remove('open');
+    showToast('Тема переключена: ' + next);
+  });
+})();
+
+(function setupHeroTilt() {
+  const card = document.querySelector('.hero-card');
+  if (!card) return;
+
+  card.addEventListener('pointermove', (event) => {
+    const rect = card.getBoundingClientRect();
+    const x = (event.clientX - rect.left) / rect.width;
+    const y = (event.clientY - rect.top) / rect.height;
+    const rotateY = (x - .5) * 18;
+    const rotateX = (.5 - y) * 14;
+    card.classList.add('is-tilting');
+    card.style.setProperty('--tilt-x', rotateX.toFixed(2) + 'deg');
+    card.style.setProperty('--tilt-y', rotateY.toFixed(2) + 'deg');
+    card.style.setProperty('--mx', (x * 100).toFixed(2) + '%');
+    card.style.setProperty('--my', (y * 100).toFixed(2) + '%');
+    card.style.setProperty('--orb-x', ((x - .5) * 44).toFixed(2) + 'px');
+    card.style.setProperty('--orb-y', ((y - .5) * 34).toFixed(2) + 'px');
+  });
+
+  card.addEventListener('pointerleave', () => {
+    card.classList.remove('is-tilting');
+    card.style.removeProperty('--tilt-x');
+    card.style.removeProperty('--tilt-y');
+    card.style.removeProperty('--mx');
+    card.style.removeProperty('--my');
+    card.style.removeProperty('--orb-x');
+    card.style.removeProperty('--orb-y');
+  });
+})();
+
+(function setupCrewCards() {
+  document.querySelectorAll('.crew-card').forEach((card) => {
+    card.addEventListener('pointermove', (event) => {
+      const rect = card.getBoundingClientRect();
+      const x = ((event.clientX - rect.left) / rect.width * 100).toFixed(2) + '%';
+      const y = ((event.clientY - rect.top) / rect.height * 100).toFixed(2) + '%';
+      card.querySelectorAll('.crew-face').forEach((face) => {
+        face.style.setProperty('--mx', x);
+        face.style.setProperty('--my', y);
+      });
+    });
+  });
+})();
+/* === end BLANCH interactive card/theme fixes === */
+
 
     bootAuth();
