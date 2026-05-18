@@ -21,6 +21,8 @@ body{background:var(--dark);color:var(--silver);font-family:'Raleway',sans-serif
 /* ── CURSOR ── */
 .cursor{position:fixed;width:8px;height:8px;background:var(--chrome);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:difference;will-change:left,top}
 .cursor-ring{position:fixed;width:36px;height:36px;border:1px solid rgba(255,255,255,0.3);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:transform 0.3s,border-color 0.3s;mix-blend-mode:difference;will-change:left,top}
+.cursor,.cursor-ring{display:none!important}
+button,a,.btn,.btn-discord{cursor:pointer}
 
 /* ── DISCORD LOGIN OVERLAY ── */
 #login-overlay{
@@ -1597,6 +1599,11 @@ const stateDenied  = document.getElementById('state-denied');
 const loginBtn     = document.getElementById('login-btn');
 const btnLogout    = document.getElementById('btn-logout');
 
+function startDiscordLogin() {
+  loginBtn?.classList.add('loading');
+  location.href = API_BASE + '/auth/discord';
+}
+
 function showState(name) {
   stateLogin .style.display = name === 'login'    ? '' : 'none';
   stateCheck .classList.toggle('show', name === 'checking');
@@ -1701,13 +1708,9 @@ async function init() {
   }
 
   showState('login');
-
-  loginBtn.addEventListener('click', () => {
-    loginBtn.classList.add('loading');
-    location.href = API_BASE + '/auth/discord';
-  });
 }
 
+loginBtn?.addEventListener('click', startDiscordLogin);
 btnLogout?.addEventListener('click', logout);
 
 init();
