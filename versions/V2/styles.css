@@ -888,3 +888,43 @@
       .card-title { font-size: 36px; }
       .orb { width: 250px; height: 250px; }
     }
+
+
+/* V2: blood chrome variant */
+:root {
+  --red: #ff002f;
+  --violet: #ff365f;
+  --muted: #bcb3b8;
+}
+body {
+  background:
+    radial-gradient(circle at 18% 8%, rgba(255,0,47,.3), transparent 30vw),
+    radial-gradient(circle at 86% 32%, rgba(255,255,255,.08), transparent 24vw),
+    linear-gradient(180deg, #040002 0%, #130107 48%, #040002 100%);
+}
+.hero {
+  grid-template-columns: 1fr;
+  text-align: center;
+  justify-items: center;
+}
+.hero-copy { max-width: 980px; }
+.title3d { font-size: clamp(76px, 16vw, 220px); }
+.tagline { margin-left: auto; margin-right: auto; }
+.hero-actions { justify-content: center; }
+.hero-card {
+  width: min(860px, 100%);
+  min-height: 330px;
+  transform: perspective(1200px) rotateX(5deg);
+}
+.hero-card .orb { width: 430px; height: 240px; border-radius: 50%; }
+.card-title { inset: auto 34px 32px; text-align: left; }
+.gate-card {
+  min-height: 520px;
+  border-color: rgba(255,0,47,.22);
+  background:
+    radial-gradient(circle at 50% 18%, rgba(255,255,255,.1), transparent 34%),
+    radial-gradient(circle at 50% 55%, rgba(255,0,47,.2), transparent 42%),
+    rgba(0,0,0,.88);
+}
+.gate-login-btn { background: linear-gradient(120deg, #ff002f, #7d0015); }
+.shot::before { color: #fff; text-shadow: 0 8px 0 #250006, 0 0 44px rgba(255,0,47,.42); }

@@ -888,3 +888,32 @@
       .card-title { font-size: 36px; }
       .orb { width: 250px; height: 250px; }
     }
+
+
+/* V3: violet mirror variant */
+:root {
+  --red: #b06cff;
+  --violet: #e2d2ff;
+  --muted: #beb6c9;
+}
+body {
+  background:
+    radial-gradient(circle at 78% 8%, rgba(176,108,255,.26), transparent 32vw),
+    radial-gradient(circle at 14% 70%, rgba(255,255,255,.08), transparent 26vw),
+    linear-gradient(180deg, #020104 0%, #090311 52%, #020104 100%);
+}
+.topbar { background: rgba(2,1,6,.78); }
+.hero { grid-template-columns: minmax(360px, 540px) minmax(0, 1fr); }
+.hero-copy { order: 2; }
+.hero-card { order: 1; transform: rotateY(9deg) rotateX(4deg); }
+.title3d {
+  font-size: clamp(58px, 10vw, 160px);
+  background: linear-gradient(180deg, #fff 0%, #cdc2ff 28%, #6d5f8c 42%, #fff 55%, #9f88d4 80%, #fff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+.discord-btn, .profile-btn, .ghost-btn, .submit-btn {
+  background: linear-gradient(120deg, #fff, #b9a8e8 42%, #fff 52%, #6f5b98);
+}
+.gate-login-btn { background: linear-gradient(120deg, #7c4dff, #b06cff); color:#fff; }
+.rank-row { background: linear-gradient(90deg, rgba(176,108,255,.2), transparent 40%), rgba(255,255,255,.045); }
